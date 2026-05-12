@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Khetflix Live Video Crop AI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:#050505;
+    --red:#ff4d4d;
+    --red2:#ff7b7b;
+    --text:#f5f5f5;
+    --muted:#989898;
+    --border:rgba(255,255,255,0.07);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+html{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+}
+
+body{
+    width:100%;
+    max-width:100%;
+    min-height:100vh;
+    min-height:100svh;
+    background:var(--bg);
+    color:var(--text);
+    overflow-x:hidden;
+}
+
+body::before,
+body::after{
+    content:'';
+    position:fixed;
+    border-radius:50%;
+    pointer-events:none;
+    filter:blur(80px);
+}
+
+body::before{
+    width:720px;
+    height:720px;
+    right:-260px;
+    top:-300px;
+    background:radial-gradient(circle,rgba(255,77,77,0.16),transparent 70%);
+    animation:glowFloat 9s ease-in-out infinite;
+}
+
+body::after{
+    width:560px;
+    height:560px;
+    left:-220px;
+    bottom:-240px;
+    background:radial-gradient(circle,rgba(255,123,123,0.09),transparent 70%);
+    animation:glowFloat2 11s ease-in-out infinite;
+}
+
+@keyframes glowFloat{
+    0%,100%{ transform:translate(0,0); }
+    50%{ transform:translate(-28px,38px); }
+}
+
+@keyframes glowFloat2{
+    0%,100%{ transform:translate(0,0); }
+    50%{ transform:translate(36px,-26px); }
+}
+
+.top-nav{
+    position:fixed;
+    top:18px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:10;
+    display:flex;
+    gap:10px;
+    padding:8px;
+    border-radius:18px;
+    background:rgba(12,12,12,0.82);
+    border:1px solid var(--border);
+    backdrop-filter:blur(18px);
+}
+
+.top-nav a{
+    color:#aaa;
+    text-decoration:none;
+    font-size:0.82rem;
+    font-weight:600;
+    padding:8px 12px;
+    border-radius:12px;
+    transition:0.25s;
+    white-space:nowrap;
+}
+
+.top-nav a:hover,
+.top-nav a.active{
+    color:white;
+    background:rgba(255,77,77,0.16);
+}
+
+.shell{
+    min-height:100vh;
+    min-height:100svh;
+    display:grid;
+    grid-template-columns:minmax(360px,1.1fr) minmax(360px,0.9fr);
+    gap:24px;
+    align-items:stretch;
+    padding:96px 36px 32px;
+    position:relative;
+    z-index:2;
+}
+
+.video-card,
+.caption-card{
+    min-width:0;
+    border-radius:30px;
+    background:linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.025));
+    border:1px solid var(--border);
+    box-shadow:0 30px 90px rgba(0,0,0,0.44),0 0 60px rgba(255,77,77,0.08);
+    backdrop-filter:blur(22px);
+    padding:1px;
+    position:relative;
+    overflow:hidden;
+}
+
+.video-card::before,
+.caption-card::before{
+    content:'';
+    position:absolute;
+    inset:-45%;
+    background:conic-gradient(from 180deg,transparent,rgba(255,77,77,0.12),transparent,rgba(255,123,123,0.08),transparent);
+    animation:spinAura 12s linear infinite;
+    opacity:0.72;
+}
+
+@keyframes spinAura{
+    to{ transform:rotate(360deg); }
+}
+
+.inner{
+    position:relative;
+    z-index:1;
+    height:100%;
+    border-radius:29px;
+    background:linear-gradient(145deg,rgba(12,12,12,0.94),rgba(8,8,8,0.9));
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+}
+
+.panel-top{
+    min-height:74px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:18px 22px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    flex-shrink:0;
+}
+
+.panel-title{
+    min-width:0;
+}
+
+.panel-title b{
+    display:block;
+    font-size:1rem;
+    margin-bottom:4px;
+}
+
+.panel-title span{
+    display:block;
+    color:var(--muted);
+    font-size:0.82rem;
+    line-height:1.5;
+}
+
+.status-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:38px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.07);
+    background:rgba(255,255,255,0.045);
+    color:#d8d8d8;
+    font-size:0.82rem;
+    font-weight:600;
+    padding:8px 13px;
+    white-space:nowrap;
+}
+
+.online{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#777;
+    box-shadow:0 0 16px rgba(255,255,255,0.18);
+}
+
+.online.active{
+    background:#00ff95;
+    box-shadow:0 0 16px #00ff95;
+}
+
+.camera-area{
+    flex:1;
+    min-height:0;
+    display:grid;
+    grid-template-rows:minmax(260px,1fr) auto;
+    gap:16px;
+    padding:22px;
+}
+
+.video-frame{
+    position:relative;
+    min-height:320px;
+    border-radius:24px;
+    overflow:hidden;
+    background:#090909;
+    border:1px solid rgba(255,255,255,0.06);
+}
+
+video,
+.poster{
+    width:100%;
+    height:100%;
+    min-height:320px;
+    object-fit:cover;
+    display:block;
+}
+
+.poster{
+    display:grid;
+    place-items:center;
+    text-align:center;
+    padding:26px;
+    color:#cfcfcf;
+    line-height:1.7;
+    background:
+        linear-gradient(135deg,rgba(255,77,77,0.11),rgba(255,255,255,0.03)),
+        #090909;
+}
+
+.scan-line{
+    position:absolute;
+    left:0;
+    right:0;
+    height:2px;
+    top:30%;
+    background:linear-gradient(90deg,transparent,rgba(255,123,123,0.9),transparent);
+    box-shadow:0 0 22px rgba(255,77,77,0.7);
+    opacity:0;
+}
+
+.video-frame.analyzing .scan-line{
+    opacity:1;
+    animation:scan 1.8s ease-in-out infinite;
+}
+
+@keyframes scan{
+    0%{ top:12%; }
+    50%{ top:86%; }
+    100%{ top:12%; }
+}
+
+.video-badge{
+    position:absolute;
+    left:14px;
+    bottom:14px;
+    max-width:calc(100% - 28px);
+    border-radius:999px;
+    background:rgba(0,0,0,0.68);
+    border:1px solid rgba(255,255,255,0.1);
+    backdrop-filter:blur(12px);
+    color:#f0f0f0;
+    font-size:0.78rem;
+    font-weight:600;
+    padding:9px 13px;
+    overflow-wrap:anywhere;
+}
+
+.controls{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:10px;
+}
+
+button,
+.ghost-btn{
+    border:none;
+    text-decoration:none;
+    border-radius:14px;
+    padding:12px 14px;
+    font-size:0.82rem;
+    font-weight:700;
+    transition:0.25s;
+    cursor:pointer;
+}
+
+.primary-btn{
+    color:white;
+    background:linear-gradient(135deg,var(--red),var(--red2));
+    box-shadow:0 0 28px rgba(255,77,77,0.24);
+}
+
+.ghost-btn{
+    color:#d8d8d8;
+    background:rgba(255,255,255,0.045);
+    border:1px solid rgba(255,255,255,0.07);
+}
+
+button:hover,
+.ghost-btn:hover{
+    transform:translateY(-2px);
+    color:white;
+}
+
+button:disabled{
+    opacity:0.45;
+    cursor:not-allowed;
+    transform:none;
+}
+
+.notes-box{
+    margin-top:14px;
+}
+
+label,
+.box-label{
+    display:block;
+    color:var(--red2);
+    font-size:0.78rem;
+    font-weight:700;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    margin-bottom:10px;
+}
+
+textarea{
+    width:100%;
+    min-height:92px;
+    resize:vertical;
+    border:none;
+    outline:none;
+    color:white;
+    background:rgba(255,255,255,0.045);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:16px;
+    padding:14px;
+    font-size:0.92rem;
+    line-height:1.65;
+}
+
+textarea::placeholder{
+    color:#777;
+}
+
+.caption-body{
+    flex:1;
+    min-height:0;
+    overflow:auto;
+    padding:22px;
+}
+
+.caption-box,
+.saved-box{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.065);
+    border-radius:22px;
+    padding:18px;
+    min-width:0;
+}
+
+.caption-box{
+    min-height:360px;
+}
+
+.caption-output{
+    color:#d8d8d8;
+    line-height:1.72;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    min-height:230px;
+}
+
+.alert-strip{
+    display:none;
+    margin-bottom:14px;
+    border-radius:16px;
+    padding:12px 14px;
+    border:1px solid rgba(255,77,77,0.26);
+    background:rgba(255,77,77,0.11);
+    color:#fff;
+    font-size:0.86rem;
+    line-height:1.6;
+}
+
+.alert-strip.show{
+    display:block;
+}
+
+.caption-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:16px;
+}
+
+.saved-box{
+    margin-top:18px;
+}
+
+.saved-list{
+    display:grid;
+    gap:10px;
+    max-height:220px;
+    overflow:auto;
+}
+
+.saved-item{
+    border-radius:16px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.06);
+    padding:12px;
+    color:#d5d5d5;
+}
+
+.saved-item b{
+    display:block;
+    color:white;
+    font-size:0.84rem;
+    margin-bottom:6px;
+}
+
+.saved-item span{
+    display:-webkit-box;
+    -webkit-line-clamp:4;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+    color:#aaa;
+    font-size:0.8rem;
+    line-height:1.6;
+}
+
+.loading{
+    display:none;
+    align-items:center;
+    gap:8px;
+    color:var(--red2);
+    font-weight:700;
+    margin-top:14px;
+}
+
+.loading.show{
+    display:flex;
+}
+
+.loading span{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--red2);
+    animation:bounce 1.2s infinite;
+}
+
+.loading span:nth-child(2){ animation-delay:0.2s; }
+.loading span:nth-child(3){ animation-delay:0.4s; }
+
+@keyframes bounce{
+    0%,80%,100%{ transform:scale(0.45); opacity:0.4; }
+    40%{ transform:scale(1); opacity:1; }
+}
+
+canvas{
+    display:none;
+}
+
+.caption-body::-webkit-scrollbar,
+.saved-list::-webkit-scrollbar{
+    width:6px;
+}
+
+.caption-body::-webkit-scrollbar-thumb,
+.saved-list::-webkit-scrollbar-thumb{
+    background:rgba(255,77,77,0.35);
+    border-radius:20px;
+}
+
+@media(max-width:1080px){
+    body{ overflow-y:auto; }
+    .shell{
+        grid-template-columns:1fr;
+        padding:100px 20px 34px;
+    }
+    .video-card,
+    .caption-card{
+        min-height:620px;
+    }
+}
+
+@media(max-width:720px){
+    .panel-top{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+    .controls{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+}
+
+@media(max-width:560px){
+    .top-nav{
+        left:12px;
+        right:12px;
+        width:auto;
+        transform:none;
+        justify-content:flex-start;
+        overflow-x:auto;
+        gap:4px;
+    }
+    .top-nav a{
+        padding:8px 9px;
+        font-size:0.75rem;
+    }
+    .shell{
+        padding-left:14px;
+        padding-right:14px;
+    }
+    .video-card,
+    .caption-card{
+        width:calc(100vw - 28px);
+        max-width:calc(100vw - 28px);
+        border-radius:24px;
+        min-height:auto;
+    }
+    .inner{
+        border-radius:23px;
+    }
+    .camera-area,
+    .caption-body{
+        padding:14px;
+    }
+    .video-frame,
+    video,
+    .poster{
+        min-height:300px;
+    }
+    .controls{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+<nav class="top-nav" aria-label="Main navigation">
+    <a href="/home">Home</a>
+    <a href="/chatbot">Chatbot</a>
+    <a href="/voicebot">Voicebot</a>
+    <a href="/progressive-feedback">Progressive Feedback</a>
+    <a class="active" href="/video-analysis">Video AI</a>
+    <a href="/scheme-finder">Scheme Finder</a>
+    <a href="/india-farm-map">India Farm Map</a>
+    <a href="/login">Logout</a>
+</nav>
+
+<main class="shell">
+    <section class="video-card">
+        <div class="inner">
+            <header class="panel-top">
+                <div class="panel-title">
+                    <b>Live Crop Camera</b>
+                    <span>Show crop leaves, fruits, soil, water condition, and affected areas slowly.</span>
+                </div>
+                <div class="status-pill"><span class="online" id="cameraLight"></span><span id="cameraStatus">Camera off</span></div>
+            </header>
+
+            <div class="camera-area">
+                <div class="video-frame" id="videoFrame">
+                    <video id="cameraVideo" autoplay playsinline muted></video>
+                    <div class="poster" id="cameraPoster">
+                        Start the camera to show your crop. The AI will read a captured frame and write captions on the right.
+                    </div>
+                    <div class="scan-line"></div>
+                    <div class="video-badge" id="videoBadge">Ready for camera</div>
+                </div>
+
+                <div>
+                    <div class="controls">
+                        <button class="primary-btn" id="startBtn" type="button">Start Camera</button>
+                        <button class="ghost-btn" id="analyzeBtn" type="button" disabled>Analyze Frame</button>
+                        <button class="ghost-btn" id="autoBtn" type="button" disabled>Auto Captions</button>
+                        <button class="ghost-btn" id="stopBtn" type="button" disabled>Stop</button>
+                    </div>
+
+                    <div class="notes-box">
+                        <label for="farmerNotes">Farmer notes</label>
+                        <textarea id="farmerNotes" placeholder="Example: Chilli crop, 60 days old, leaves curling, water every 3 days, 1 acre, near Mandya. I want disease check and maximum profit ideas."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="caption-card">
+        <div class="inner">
+            <header class="panel-top">
+                <div class="panel-title">
+                    <b>AI Captions and Profit Ideas</b>
+                    <span>Analysis appears here while the farmer shows the crop.</span>
+                </div>
+                <div class="status-pill"><span class="online active"></span><span id="captionStatus">Ready</span></div>
+            </header>
+
+            <div class="caption-body">
+                <div class="caption-box">
+                    <div class="box-label">Live AI caption</div>
+                    <div class="alert-strip" id="alertStrip">Possible disease or stress found. This result has been saved in the findings list.</div>
+                    <div class="caption-output" id="captionOutput">
+Start the camera, show the crop clearly, and press Analyze Frame. For better results, show one close-up leaf or fruit, one full plant view, and the soil or water area.
+                    </div>
+                    <div class="loading" id="loadingDots">
+                        <span></span><span></span><span></span>
+                        <div>ChatGPT is analyzing the crop frame...</div>
+                    </div>
+                    <div class="caption-actions">
+                        <button class="primary-btn" id="saveBtn" type="button" disabled>Save Finding</button>
+                        <button class="ghost-btn" id="downloadBtn" type="button">Download Saved</button>
+                        <button class="ghost-btn" id="clearSavedBtn" type="button">Clear Saved</button>
+                    </div>
+                </div>
+
+                <div class="saved-box">
+                    <div class="box-label">Saved disease and profit findings</div>
+                    <div class="saved-list" id="savedList"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<canvas id="captureCanvas"></canvas>
+
+<script>
+const API_BASE = "";
+
+const video = document.getElementById("cameraVideo");
+const canvas = document.getElementById("captureCanvas");
+const poster = document.getElementById("cameraPoster");
+const videoFrame = document.getElementById("videoFrame");
+const videoBadge = document.getElementById("videoBadge");
+const cameraLight = document.getElementById("cameraLight");
+const cameraStatus = document.getElementById("cameraStatus");
+const captionStatus = document.getElementById("captionStatus");
+const captionOutput = document.getElementById("captionOutput");
+const alertStrip = document.getElementById("alertStrip");
+const loadingDots = document.getElementById("loadingDots");
+const farmerNotes = document.getElementById("farmerNotes");
+const savedList = document.getElementById("savedList");
+
+const startBtn = document.getElementById("startBtn");
+const analyzeBtn = document.getElementById("analyzeBtn");
+const autoBtn = document.getElementById("autoBtn");
+const stopBtn = document.getElementById("stopBtn");
+const saveBtn = document.getElementById("saveBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const clearSavedBtn = document.getElementById("clearSavedBtn");
+
+let stream = null;
+let autoTimer = null;
+let isAnalyzing = false;
+let lastAnalysis = "";
+let lastAnalyzedAt = "";
+
+function loadSaved() {
+    try {
+        return JSON.parse(localStorage.getItem("khetflix_video_findings") || "[]");
+    } catch (_) {
+        return [];
+    }
+}
+
+function storeSaved(items) {
+    localStorage.setItem("khetflix_video_findings", JSON.stringify(items));
+}
+
+function renderSaved() {
+    const items = loadSaved();
+    savedList.innerHTML = "";
+
+    if (!items.length) {
+        const empty = document.createElement("div");
+        empty.className = "saved-item";
+        empty.innerHTML = "<b>No saved findings yet</b><span>Disease alerts and useful profit advice will appear here after saving.</span>";
+        savedList.appendChild(empty);
+        return;
+    }
+
+    items.slice().reverse().forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "saved-item";
+        const date = new Date(item.created_at).toLocaleString();
+        row.innerHTML = `<b>${date}</b><span>${escapeHtml(item.analysis)}</span>`;
+        savedList.appendChild(row);
+    });
+}
+
+function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, (char) => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+    }[char]));
+}
+
+function setCameraReady(ready) {
+    analyzeBtn.disabled = !ready;
+    autoBtn.disabled = !ready;
+    stopBtn.disabled = !ready;
+    cameraLight.classList.toggle("active", ready);
+    cameraStatus.innerText = ready ? "Camera live" : "Camera off";
+    videoBadge.innerText = ready ? "Camera live. Hold crop steady before analysis." : "Ready for camera";
+}
+
+function setBusy(state) {
+    isAnalyzing = state;
+    analyzeBtn.disabled = state || !stream;
+    autoBtn.disabled = state || !stream;
+    startBtn.disabled = state;
+    saveBtn.disabled = state || !lastAnalysis;
+    loadingDots.classList.toggle("show", state);
+    videoFrame.classList.toggle("analyzing", state);
+    if (state) captionStatus.innerText = "Analyzing";
+}
+
+async function startCamera() {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: { ideal: "environment" },
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            },
+            audio: false
+        });
+
+        video.srcObject = stream;
+        poster.style.display = "none";
+        video.style.display = "block";
+        setCameraReady(true);
+        startBtn.innerText = "Restart Camera";
+    } catch (error) {
+        captionOutput.innerText = "Camera could not start: " + error.message + "\n\nAllow camera permission in the browser and use localhost or HTTPS.";
+        cameraStatus.innerText = "Camera blocked";
+    }
+}
+
+function stopCamera() {
+    stopAutoCaptions();
+    if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+        stream = null;
+    }
+    video.srcObject = null;
+    poster.style.display = "grid";
+    setCameraReady(false);
+    startBtn.disabled = false;
+}
+
+function captureFrameBlob() {
+    return new Promise((resolve, reject) => {
+        if (!stream || !video.videoWidth) {
+            reject(new Error("Camera is not ready yet."));
+            return;
+        }
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob((blob) => {
+            if (!blob) {
+                reject(new Error("Could not capture camera frame."));
+                return;
+            }
+            resolve(blob);
+        }, "image/jpeg", 0.9);
+    });
+}
+
+async function analyzeFrame() {
+    if (isAnalyzing) return;
+
+    setBusy(true);
+    alertStrip.classList.remove("show");
+    captionOutput.innerText = "Reading the live crop frame and preparing captions.";
+    videoBadge.innerText = "Analyzing current frame...";
+
+    try {
+        const blob = await captureFrameBlob();
+        const formData = new FormData();
+        formData.append("image", blob, "camera-frame.jpg");
+        formData.append("description", farmerNotes.value.trim());
+
+        const response = await fetch(`${API_BASE}/analyze-video-frame`, {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+            throw new Error(data.error || "Video analysis failed.");
+        }
+
+        lastAnalysis = data.response;
+        lastAnalyzedAt = data.analyzed_at || new Date().toISOString();
+        captionOutput.innerText = data.response;
+        saveBtn.disabled = false;
+        captionStatus.innerText = "Caption ready";
+        videoBadge.innerText = data.save_alert ? "Possible disease/stress alert saved" : "Analysis complete";
+
+        if (data.save_alert) {
+            alertStrip.classList.add("show");
+            saveFinding(true);
+        }
+    } catch (error) {
+        captionOutput.innerText = "Error: " + error.message + "\n\nCheck camera permission, backend status, and OPENAI_API_KEY.";
+        captionStatus.innerText = "Error";
+        videoBadge.innerText = "Analysis failed";
+    } finally {
+        setBusy(false);
+    }
+}
+
+function startAutoCaptions() {
+    if (autoTimer) {
+        stopAutoCaptions();
+        return;
+    }
+
+    autoBtn.innerText = "Stop Auto";
+    videoBadge.innerText = "Auto captions on. Capturing every 12 seconds.";
+    analyzeFrame();
+    autoTimer = setInterval(() => {
+        if (!isAnalyzing && stream) analyzeFrame();
+    }, 12000);
+}
+
+function stopAutoCaptions() {
+    if (autoTimer) {
+        clearInterval(autoTimer);
+        autoTimer = null;
+    }
+    autoBtn.innerText = "Auto Captions";
+}
+
+function saveFinding(autoSaved = false) {
+    if (!lastAnalysis) return;
+
+    const items = loadSaved();
+    const duplicate = items.some((item) => item.analysis === lastAnalysis);
+
+    if (!duplicate) {
+        items.push({
+            created_at: lastAnalyzedAt || new Date().toISOString(),
+            notes: farmerNotes.value.trim(),
+            analysis: lastAnalysis,
+            auto_saved: autoSaved
+        });
+        storeSaved(items.slice(-20));
+        renderSaved();
+    }
+
+    if (!autoSaved) {
+        videoBadge.innerText = "Finding saved";
+    }
+}
+
+function downloadSaved() {
+    const items = loadSaved();
+    if (!items.length) {
+        captionOutput.innerText = "No saved findings to download yet.";
+        return;
+    }
+
+    const text = items.map((item, index) => {
+        return [
+            `Finding ${index + 1}`,
+            `Time: ${new Date(item.created_at).toLocaleString()}`,
+            `Farmer notes: ${item.notes || "Not provided"}`,
+            "",
+            item.analysis
+        ].join("\n");
+    }).join("\n\n------------------------------\n\n");
+
+    const blob = new Blob([text], { type:"text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "khetflix-video-findings.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function clearSaved() {
+    if (!confirm("Clear all saved video findings?")) return;
+    localStorage.removeItem("khetflix_video_findings");
+    renderSaved();
+}
+
+startBtn.addEventListener("click", startCamera);
+stopBtn.addEventListener("click", stopCamera);
+analyzeBtn.addEventListener("click", analyzeFrame);
+autoBtn.addEventListener("click", startAutoCaptions);
+saveBtn.addEventListener("click", () => saveFinding(false));
+downloadBtn.addEventListener("click", downloadSaved);
+clearSavedBtn.addEventListener("click", clearSaved);
+
+window.addEventListener("beforeunload", stopCamera);
+
+renderSaved();
+setCameraReady(false);
+</script>
+</body>
+</html>

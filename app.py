@@ -278,6 +278,48 @@ Chemical caution:
 - Tell exactly what photo and details to send next.
 """
 
+SYSTEM_VIDEO_ANALYSIS_PROMPT = """
+You are KHETFLIX Live Crop Video AI, a practical agricultural vision assistant for Indian farmers.
+
+Analyze the current camera frame and the farmer's notes as if you are writing live captions beside a video.
+
+Tone:
+- Be direct, practical, and farmer-friendly.
+- Keep the answer compact enough for a live caption panel.
+- Do not claim certainty from one frame.
+- If the image is unclear, say what angle or close-up is needed.
+
+Safety rules:
+- Never give a guaranteed diagnosis from video alone.
+- If disease, pest, nutrient deficiency, water stress, or weather damage is possible, say the visible signs.
+- For chemical treatment, tell the farmer to confirm local product and dose with an agriculture officer or label.
+
+Output format:
+LIVE CAPTION
+- 2 to 3 short lines describing what is visible now.
+
+CROP / WATER CHECK
+- Crop or plant part seen:
+- Growth stage:
+- Water or soil condition:
+
+POSSIBLE DISEASE / STRESS
+- Issue:
+- Confidence: Low / Medium / High
+- Signs:
+- Save alert: Yes / No
+
+WHAT TO DO NOW
+- 3 to 5 immediate practical steps.
+
+MAX PROFIT IDEAS
+- 4 crop-specific or field-specific ways to improve profit.
+- Include grading, timing, direct sale, value addition, water saving, input cost control, or market route when relevant.
+
+NEXT CAMERA VIEW
+- Tell the farmer what to show next for a better answer.
+"""
+
 # ---------------- HELPERS ----------------
 
 def create_session():
@@ -349,6 +391,11 @@ def voicebot_page():
 @app.route("/progressive-feedback")
 def progressive_feedback_page():
     return render_template("progressive_feedback.html")
+
+
+@app.route("/video-analysis")
+def video_analysis_page():
+    return render_template("video_analysis.html")
 
 
 @app.route("/scheme-finder")
@@ -585,6 +632,42 @@ def analyze_crop_image(description, image_data_url):
         ],
         temperature=0.35,
         max_tokens=1800
+    )
+
+    return completion.choices[0].message.content
+
+
+def analyze_video_frame(description, image_data_url):
+    farmer_context = description.strip() or "No extra farmer notes were provided."
+
+    completion = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": SYSTEM_VIDEO_ANALYSIS_PROMPT},
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": (
+                            "Farmer notes:\n"
+                            f"{farmer_context}\n\n"
+                            "Analyze this live camera frame. Give caption-style crop health, disease/stress, "
+                            "water condition, and profit guidance using the required format."
+                        )
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": image_data_url,
+                            "detail": "high"
+                        }
+                    }
+                ]
+            }
+        ],
+        temperature=0.3,
+        max_tokens=1300
     )
 
     return completion.choices[0].message.content
@@ -854,6 +937,33 @@ def analyze_crop():
 
     except Exception as e:
         print("PROGRESSIVE FEEDBACK ERROR:", str(e))
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/analyze-video-frame", methods=["POST"])
+def analyze_video_frame_route():
+    try:
+        if "image" not in request.files:
+            return jsonify({"error": "camera frame missing"}), 400
+
+        description = request.form.get("description", "").strip()
+        image_data_url = encode_uploaded_image(request.files["image"])
+        analysis = analyze_video_frame(description, image_data_url)
+
+        save_alert = "save alert: yes" in analysis.lower()
+
+        return jsonify({
+            "type": "video_crop_analysis",
+            "response": analysis,
+            "save_alert": save_alert,
+            "analyzed_at": datetime.now(timezone.utc).isoformat()
+        })
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+
+    except Exception as e:
+        print("VIDEO ANALYSIS ERROR:", str(e))
         return jsonify({"error": str(e)}), 500
 
 
