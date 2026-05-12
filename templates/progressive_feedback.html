@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Khetflix Progressive Feedback</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:#050505;
+    --red:#ff4d4d;
+    --red2:#ff7b7b;
+    --text:#f5f5f5;
+    --muted:#989898;
+    --border:rgba(255,255,255,0.07);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+html{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+}
+
+body{
+    width:100%;
+    max-width:100%;
+    min-height:100vh;
+    min-height:100svh;
+    background:var(--bg);
+    color:var(--text);
+    overflow-x:hidden;
+}
+
+body::before,
+body::after{
+    content:'';
+    position:fixed;
+    border-radius:50%;
+    pointer-events:none;
+    filter:blur(80px);
+}
+
+body::before{
+    width:720px;
+    height:720px;
+    right:-260px;
+    top:-300px;
+    background:radial-gradient(circle,rgba(255,77,77,0.16),transparent 70%);
+    animation:glowFloat 9s ease-in-out infinite;
+}
+
+body::after{
+    width:560px;
+    height:560px;
+    left:-220px;
+    bottom:-240px;
+    background:radial-gradient(circle,rgba(255,123,123,0.09),transparent 70%);
+    animation:glowFloat2 11s ease-in-out infinite;
+}
+
+@keyframes glowFloat{
+    0%,100%{ transform:translate(0,0); }
+    50%{ transform:translate(-28px,38px); }
+}
+
+@keyframes glowFloat2{
+    0%,100%{ transform:translate(0,0); }
+    50%{ transform:translate(36px,-26px); }
+}
+
+.top-nav{
+    position:fixed;
+    top:18px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:10;
+    display:flex;
+    gap:10px;
+    padding:8px;
+    border-radius:18px;
+    background:rgba(12,12,12,0.82);
+    border:1px solid var(--border);
+    backdrop-filter:blur(18px);
+}
+
+.top-nav a{
+    color:#aaa;
+    text-decoration:none;
+    font-size:0.82rem;
+    font-weight:600;
+    padding:8px 12px;
+    border-radius:12px;
+    transition:0.25s;
+    white-space:nowrap;
+}
+
+.top-nav a:hover,
+.top-nav a.active{
+    color:white;
+    background:rgba(255,77,77,0.16);
+}
+
+.shell{
+    min-height:100vh;
+    min-height:100svh;
+    display:grid;
+    grid-template-columns:minmax(300px,0.75fr) minmax(430px,1.25fr);
+    gap:28px;
+    align-items:center;
+    padding:96px 48px 34px;
+    position:relative;
+    z-index:2;
+}
+
+.intro{
+    width:100%;
+    min-width:0;
+    max-width:590px;
+}
+
+.eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    color:var(--red2);
+    background:rgba(255,77,77,0.09);
+    border:1px solid rgba(255,77,77,0.18);
+    border-radius:999px;
+    padding:8px 14px;
+    font-size:0.78rem;
+    font-weight:700;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    margin-bottom:22px;
+}
+
+.live-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#00ff95;
+    box-shadow:0 0 18px #00ff95;
+    animation:dotPulse 1.8s infinite;
+}
+
+@keyframes dotPulse{
+    0%{ transform:scale(1); opacity:1; }
+    70%{ transform:scale(2); opacity:0; }
+    100%{ opacity:0; }
+}
+
+h1{
+    font-size:clamp(2.35rem,4.8vw,4.8rem);
+    line-height:1.04;
+    margin-bottom:22px;
+}
+
+h1 span{
+    background:linear-gradient(to right,var(--red),var(--red2));
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.subtitle{
+    color:#c8c8c8;
+    line-height:1.8;
+    font-size:1rem;
+    max-width:560px;
+    overflow-wrap:break-word;
+}
+
+.tips{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+    margin-top:26px;
+}
+
+.tip{
+    color:#d8d8d8;
+    background:rgba(255,255,255,0.045);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:16px;
+    padding:12px 14px;
+    line-height:1.65;
+    font-size:0.88rem;
+}
+
+.feedback-card{
+    width:100%;
+    min-width:0;
+    height:min(720px, calc(100svh - 140px));
+    min-height:0;
+    border-radius:30px;
+    background:linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.025));
+    border:1px solid var(--border);
+    box-shadow:0 30px 90px rgba(0,0,0,0.44),0 0 60px rgba(255,77,77,0.08);
+    backdrop-filter:blur(22px);
+    padding:1px;
+    position:relative;
+    overflow:hidden;
+}
+
+.feedback-card::before{
+    content:'';
+    position:absolute;
+    inset:-45%;
+    background:conic-gradient(from 180deg,transparent,rgba(255,77,77,0.12),transparent,rgba(255,123,123,0.08),transparent);
+    animation:spinAura 12s linear infinite;
+    opacity:0.75;
+}
+
+@keyframes spinAura{
+    to{ transform:rotate(360deg); }
+}
+
+.feedback-inner{
+    position:relative;
+    z-index:1;
+    height:100%;
+    border-radius:29px;
+    background:linear-gradient(145deg,rgba(12,12,12,0.94),rgba(8,8,8,0.9));
+    display:grid;
+    grid-template-rows:auto minmax(0,1fr);
+    overflow:hidden;
+}
+
+.panel-top{
+    min-height:74px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:18px 22px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+}
+
+.panel-title b{
+    display:block;
+    font-size:1rem;
+    margin-bottom:4px;
+}
+
+.panel-title span{
+    color:var(--muted);
+    font-size:0.82rem;
+}
+
+.status-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:38px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.07);
+    background:rgba(255,255,255,0.045);
+    color:#d8d8d8;
+    font-size:0.82rem;
+    font-weight:600;
+    padding:8px 13px;
+    white-space:nowrap;
+}
+
+.online{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#00ff95;
+    box-shadow:0 0 16px #00ff95;
+}
+
+.work-area{
+    min-height:0;
+    overflow:auto;
+    padding:22px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:minmax(220px,0.9fr) minmax(260px,1.1fr);
+    gap:18px;
+}
+
+.upload-box,
+.description-box,
+.result-box{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.065);
+    border-radius:22px;
+    padding:18px;
+    min-width:0;
+}
+
+.upload-zone{
+    min-height:260px;
+    border:1px dashed rgba(255,77,77,0.36);
+    border-radius:18px;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    padding:18px;
+    background:rgba(255,77,77,0.045);
+    cursor:pointer;
+    overflow:hidden;
+}
+
+.upload-zone img{
+    width:100%;
+    max-height:330px;
+    object-fit:contain;
+    border-radius:14px;
+    display:none;
+}
+
+.upload-zone.has-image{
+    display:block;
+    padding:10px;
+}
+
+.upload-zone.has-image img{
+    display:block;
+}
+
+.upload-copy{
+    color:#d7d7d7;
+    line-height:1.7;
+}
+
+.upload-copy b{
+    color:white;
+    display:block;
+    margin-bottom:8px;
+}
+
+input[type="file"]{
+    display:none;
+}
+
+label,
+.box-label{
+    display:block;
+    color:var(--red2);
+    font-size:0.78rem;
+    font-weight:700;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    margin-bottom:10px;
+}
+
+textarea{
+    width:100%;
+    min-height:236px;
+    resize:vertical;
+    border:none;
+    outline:none;
+    color:white;
+    background:rgba(255,255,255,0.045);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:16px;
+    padding:14px;
+    font-size:0.94rem;
+    line-height:1.65;
+}
+
+textarea::placeholder{
+    color:#777;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:14px;
+}
+
+.primary-btn,
+.ghost-btn{
+    border:none;
+    text-decoration:none;
+    border-radius:14px;
+    padding:12px 16px;
+    font-size:0.84rem;
+    font-weight:700;
+    transition:0.25s;
+    cursor:pointer;
+}
+
+.primary-btn{
+    color:white;
+    background:linear-gradient(135deg,var(--red),var(--red2));
+    box-shadow:0 0 28px rgba(255,77,77,0.24);
+}
+
+.ghost-btn{
+    color:#d8d8d8;
+    background:rgba(255,255,255,0.045);
+    border:1px solid rgba(255,255,255,0.07);
+}
+
+.primary-btn:hover,
+.ghost-btn:hover{
+    transform:translateY(-2px);
+    color:white;
+}
+
+.primary-btn:disabled{
+    opacity:0.48;
+    cursor:not-allowed;
+    transform:none;
+}
+
+.result-box{
+    margin-top:18px;
+}
+
+.result-content{
+    color:#d8d8d8;
+    line-height:1.75;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    min-height:120px;
+}
+
+.loading{
+    display:none;
+    align-items:center;
+    gap:8px;
+    color:var(--red2);
+    font-weight:700;
+    margin-top:14px;
+}
+
+.loading span{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--red2);
+    animation:bounce 1.2s infinite;
+}
+
+.loading span:nth-child(2){ animation-delay:0.2s; }
+.loading span:nth-child(3){ animation-delay:0.4s; }
+
+@keyframes bounce{
+    0%,80%,100%{ transform:scale(0.45); opacity:0.4; }
+    40%{ transform:scale(1); opacity:1; }
+}
+
+.work-area::-webkit-scrollbar{
+    width:6px;
+}
+
+.work-area::-webkit-scrollbar-thumb{
+    background:rgba(255,77,77,0.35);
+    border-radius:20px;
+}
+
+@media(max-width:1040px){
+    body{ overflow-y:auto; }
+    .shell{
+        min-height:100svh;
+        grid-template-columns:1fr;
+        padding:100px 20px 34px;
+    }
+    .intro{
+        text-align:center;
+        margin:auto;
+    }
+    .subtitle{
+        margin-left:auto;
+        margin-right:auto;
+    }
+    .feedback-card{
+        height:auto;
+        min-height:720px;
+    }
+}
+
+@media(max-width:720px){
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+    .panel-top{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+}
+
+@media(max-width:560px){
+    .top-nav{
+        left:12px;
+        right:12px;
+        width:auto;
+        transform:none;
+        justify-content:flex-start;
+        overflow-x:auto;
+        gap:4px;
+    }
+    .top-nav a{
+        padding:8px 9px;
+        font-size:0.75rem;
+    }
+    .shell{
+        padding-left:14px;
+        padding-right:14px;
+    }
+    .intro,
+    .feedback-card{
+        width:calc(100vw - 28px);
+        max-width:calc(100vw - 28px);
+    }
+    h1{
+        font-size:2.3rem;
+        width:min(320px, calc(100vw - 70px));
+        margin-left:auto;
+        margin-right:auto;
+    }
+    .subtitle{
+        width:min(310px, calc(100vw - 74px));
+        max-width:min(310px, calc(100vw - 74px));
+        font-size:0.92rem;
+    }
+    .work-area{
+        padding:14px;
+    }
+    .upload-box,
+    .description-box,
+    .result-box{
+        border-radius:18px;
+        padding:14px;
+    }
+    .upload-zone{
+        min-height:220px;
+    }
+    textarea{
+        min-height:220px;
+    }
+}
+</style>
+</head>
+
+<body>
+<nav class="top-nav" aria-label="Main navigation">
+    <a href="/home">Home</a>
+    <a href="/chatbot">Chatbot</a>
+    <a href="/voicebot">Voicebot</a>
+    <a class="active" href="/progressive-feedback">Progressive Feedback</a>
+    <a href="/scheme-finder">Scheme Finder</a>
+    <a href="/login">Logout</a>
+</nav>
+
+<main class="shell">
+    <section class="intro">
+        <div class="eyebrow"><span class="live-dot"></span> Khetflix crop vision</div>
+        <h1>Upload crop photos for <span>progressive feedback</span></h1>
+        <p class="subtitle">
+            Send a clear crop image and describe symptoms, crop age, location, recent weather,
+            fertilizer, pesticide use, and watering. Khetflix will analyze the picture and suggest next actions.
+        </p>
+
+        <div class="tips">
+            <div class="tip">Use close-up leaf or fruit photos plus one wider plant photo when possible.</div>
+            <div class="tip">Mention how many plants are affected and when the problem started.</div>
+            <div class="tip">Confirm serious disease or chemical treatment with a local expert before spraying.</div>
+        </div>
+    </section>
+
+    <section class="feedback-card">
+        <div class="feedback-inner">
+            <header class="panel-top">
+                <div class="panel-title">
+                    <b>Progressive Feedback Assistant</b>
+                    <span>Image analysis for crop disease, pest, nutrient, and stress signals.</span>
+                </div>
+                <div class="status-pill"><span class="online"></span><span id="statusText">Ready</span></div>
+            </header>
+
+            <div class="work-area">
+                <form id="feedbackForm">
+                    <div class="form-grid">
+                        <div class="upload-box">
+                            <div class="box-label">Crop image</div>
+                            <label class="upload-zone" id="uploadZone" for="imageInput">
+                                <img id="previewImage" alt="Crop preview" />
+                                <span class="upload-copy" id="uploadCopy">
+                                    <b>Choose crop photo</b>
+                                    PNG, JPG, JPEG, or WEBP. Clear natural light works best.
+                                </span>
+                            </label>
+                            <input id="imageInput" name="image" type="file" accept="image/png,image/jpeg,image/webp" required />
+                        </div>
+
+                        <div class="description-box">
+                            <label for="descriptionInput">Farmer description</label>
+                            <textarea id="descriptionInput" name="description" required placeholder="Example: Tomato crop, 45 days old, leaves turning yellow with dark spots for 5 days. Field is near Mandya, rain happened last week. Sprayed neem oil once. Around 20 plants affected."></textarea>
+                            <div class="actions">
+                                <button class="primary-btn" id="analyzeBtn" type="submit">Analyze Crop</button>
+                                <button class="ghost-btn" type="button" onclick="clearForm()">Clear</button>
+                            </div>
+                            <div class="loading" id="loadingDots">
+                                <span></span><span></span><span></span>
+                                <div>Analyzing crop image...</div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="result-box">
+                    <div class="box-label">AI suggestions</div>
+                    <div class="result-content" id="resultContent">
+                        Upload a crop picture and description to receive observations, possible causes, immediate steps, remedies, prevention, and follow-up guidance.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+const API_BASE = "http://127.0.0.1:5000";
+
+const form = document.getElementById("feedbackForm");
+const imageInput = document.getElementById("imageInput");
+const previewImage = document.getElementById("previewImage");
+const uploadZone = document.getElementById("uploadZone");
+const uploadCopy = document.getElementById("uploadCopy");
+const descriptionInput = document.getElementById("descriptionInput");
+const analyzeBtn = document.getElementById("analyzeBtn");
+const loadingDots = document.getElementById("loadingDots");
+const resultContent = document.getElementById("resultContent");
+const statusText = document.getElementById("statusText");
+
+function setBusy(state) {
+    analyzeBtn.disabled = state;
+    imageInput.disabled = state;
+    descriptionInput.disabled = state;
+    loadingDots.style.display = state ? "flex" : "none";
+    if (state) {
+        statusText.innerText = "Analyzing";
+    }
+}
+
+imageInput.addEventListener("change", () => {
+    const file = imageInput.files[0];
+
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+    previewImage.src = url;
+    uploadZone.classList.add("has-image");
+    uploadCopy.style.display = "none";
+});
+
+form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const image = imageInput.files[0];
+    const description = descriptionInput.value.trim();
+
+    if (!image) {
+        resultContent.innerText = "Please choose a crop image first.";
+        return;
+    }
+
+    if (description.length < 12) {
+        resultContent.innerText = "Please add a useful description of the crop and symptoms.";
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", image);
+    formData.append("description", description);
+
+    setBusy(true);
+    resultContent.innerText = "Khetflix is studying the crop photo and farmer notes.";
+
+    try {
+        const response = await fetch(`${API_BASE}/analyze-crop`, {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+            throw new Error(data.error || "Analysis failed.");
+        }
+
+        resultContent.innerText = data.response;
+        statusText.innerText = "Feedback ready";
+    } catch (error) {
+        resultContent.innerText = "Error: " + error.message + "\n\nMake sure Flask is running and your OpenAI API key is configured.";
+        statusText.innerText = "Error";
+    } finally {
+        setBusy(false);
+    }
+});
+
+function clearForm() {
+    form.reset();
+    previewImage.removeAttribute("src");
+    uploadZone.classList.remove("has-image");
+    uploadCopy.style.display = "";
+    resultContent.innerText = "Upload a crop picture and description to receive observations, possible causes, immediate steps, remedies, prevention, and follow-up guidance.";
+    statusText.innerText = "Ready";
+}
+</script>
+</body>
+</html>

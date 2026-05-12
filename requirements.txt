@@ -1,0 +1,6 @@
+flask
+openai
+python-dotenv
+flask-cors
+reportlab
+gunicorn

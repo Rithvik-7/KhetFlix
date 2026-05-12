@@ -1,0 +1,12 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+
+response.mp3
+temp_input.wav
+
+.vscode/

@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Khetflix - Home</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:#050505;
+    --panel:#0c0c0c;
+    --card:#141414;
+    --red:#ff4d4d;
+    --red2:#ff7b7b;
+    --text:#f5f5f5;
+    --muted:#989898;
+    --border:rgba(255,255,255,0.06);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+html{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+}
+
+body{
+    width:100%;
+    max-width:100%;
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    overflow-x:hidden;
+    overflow-y:auto;
+}
+
+body::before{
+    content:'';
+    position:fixed;
+    width:700px;
+    height:700px;
+    background:radial-gradient(circle,rgba(255,77,77,0.12),transparent 70%);
+    top:-300px;
+    right:-200px;
+    filter:blur(80px);
+}
+
+body::after{
+    content:'';
+    position:fixed;
+    width:600px;
+    height:600px;
+    background:radial-gradient(circle,rgba(255,120,120,0.08),transparent 70%);
+    bottom:-250px;
+    left:-150px;
+    filter:blur(80px);
+}
+
+.app{
+    display:flex;
+    min-height:100vh;
+    position:relative;
+    z-index:2;
+}
+
+.sidebar{
+    width:290px;
+    background:rgba(12,12,12,0.92);
+    border-right:1px solid var(--border);
+    backdrop-filter:blur(20px);
+    padding:24px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.logo-box{
+    width:48px;
+    height:48px;
+    border-radius:14px;
+    background:linear-gradient(135deg,var(--red),var(--red2));
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    box-shadow:0 0 35px rgba(255,77,77,0.35);
+}
+
+.logo-box svg{
+    width:22px;
+    height:22px;
+}
+
+.logo-text{
+    font-size:1.15rem;
+    font-weight:700;
+    letter-spacing:0.14em;
+    background:linear-gradient(to right,var(--red),var(--red2));
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.menu{
+    margin-top:60px;
+}
+
+.menu-item{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:17px 18px;
+    margin-bottom:16px;
+    border-radius:18px;
+    background:rgba(255,255,255,0.02);
+    color:#d5d5d5;
+    transition:0.35s ease;
+    overflow:hidden;
+    border:1px solid transparent;
+    text-decoration:none;
+}
+
+.menu-item::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:linear-gradient(135deg,rgba(255,77,77,0.18),rgba(255,77,77,0.02));
+    opacity:0;
+    transition:0.35s;
+}
+
+.menu-item:hover{
+    transform:translateX(8px) scale(1.03);
+    border-color:rgba(255,77,77,0.15);
+    box-shadow:0 0 35px rgba(255,77,77,0.16);
+    color:white;
+}
+
+.menu-item:hover::before{
+    opacity:1;
+}
+
+.menu-item.active{
+    background:linear-gradient(135deg,rgba(255,77,77,0.22),rgba(255,77,77,0.04));
+    border:1px solid rgba(255,77,77,0.18);
+    box-shadow:0 0 35px rgba(255,77,77,0.16);
+    color:white;
+}
+
+.menu-item span,
+.menu-item strong{
+    position:relative;
+    z-index:1;
+}
+
+.sidebar-footer{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:16px;
+    border-radius:18px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.05);
+    color:#aaa;
+    font-size:0.82rem;
+}
+
+.pulse{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#00ff95;
+    box-shadow:0 0 16px #00ff95;
+    animation:pulse 1.8s infinite;
+    flex-shrink:0;
+}
+
+@keyframes pulse{
+    0%{ transform:scale(1); opacity:1; }
+    70%{ transform:scale(1.9); opacity:0; }
+    100%{ transform:scale(1); opacity:0; }
+}
+
+.main{
+    flex:1;
+    min-width:0;
+    height:100vh;
+    overflow:auto;
+}
+
+.topbar{
+    height:74px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 28px;
+    border-bottom:1px solid var(--border);
+    background:rgba(0,0,0,0.55);
+    backdrop-filter:blur(20px);
+    position:sticky;
+    top:0;
+    z-index:5;
+}
+
+.top-title{
+    font-size:1rem;
+    font-weight:600;
+}
+
+.top-actions{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.ghost-btn,
+.primary-btn,
+.lang-select{
+    border:none;
+    text-decoration:none;
+    border-radius:14px;
+    padding:10px 16px;
+    font-size:0.84rem;
+    font-weight:600;
+    transition:0.25s;
+}
+
+.ghost-btn{
+    color:#aaa;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.06);
+}
+
+.lang-select{
+    color:#d8d8d8;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    outline:none;
+    cursor:pointer;
+}
+
+.lang-select option{
+    color:#111;
+    background:#fff;
+}
+
+.primary-btn{
+    color:white;
+    background:linear-gradient(135deg,var(--red),var(--red2));
+    box-shadow:0 0 28px rgba(255,77,77,0.24);
+}
+
+.ghost-btn:hover,
+.primary-btn:hover{
+    transform:translateY(-2px);
+    color:white;
+}
+
+.content{
+    padding:38px 30px 46px;
+    min-width:0;
+    overflow-x:hidden;
+}
+
+.hero{
+    display:grid;
+    grid-template-columns:minmax(0,1.2fr) minmax(280px,0.8fr);
+    gap:26px;
+    align-items:stretch;
+    margin-bottom:28px;
+}
+
+.hero-copy{
+    min-width:0;
+    padding:34px;
+    border:1px solid var(--border);
+    background:linear-gradient(145deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));
+    border-radius:24px;
+}
+
+.eyebrow{
+    color:var(--red2);
+    font-size:0.78rem;
+    font-weight:700;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    margin-bottom:18px;
+}
+
+h1{
+    font-size:clamp(2.1rem,5vw,4rem);
+    line-height:1.08;
+    margin-bottom:18px;
+}
+
+h1 span{
+    background:linear-gradient(to right,var(--red),var(--red2));
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.hero-copy p{
+    color:#c9c9c9;
+    line-height:1.8;
+    max-width:760px;
+    margin-bottom:24px;
+    overflow-wrap:break-word;
+}
+
+.hero-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+}
+
+.status-card{
+    min-width:0;
+    padding:26px;
+    border-radius:24px;
+    border:1px solid rgba(255,77,77,0.16);
+    background:linear-gradient(145deg,rgba(255,77,77,0.12),rgba(255,255,255,0.025));
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    min-height:280px;
+}
+
+.status-card h2{
+    font-size:1.25rem;
+    margin-bottom:12px;
+}
+
+.status-card p{
+    color:var(--muted);
+    line-height:1.7;
+    font-size:0.92rem;
+}
+
+.weather-line{
+    color:#fff;
+    font-size:1.95rem;
+    font-weight:700;
+    margin:12px 0 6px;
+}
+
+.weather-meta{
+    color:#cfcfcf;
+    font-size:0.86rem;
+    line-height:1.7;
+    overflow-wrap:break-word;
+}
+
+.metric-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-top:22px;
+}
+
+.metric{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:16px;
+    padding:14px;
+}
+
+.metric b{
+    display:block;
+    color:white;
+    font-size:1.25rem;
+    margin-bottom:4px;
+}
+
+.metric span{
+    color:var(--muted);
+    font-size:0.78rem;
+}
+
+.section{
+    margin-top:28px;
+}
+
+.section-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:18px;
+    margin-bottom:16px;
+}
+
+.section-title h2{
+    font-size:1.1rem;
+}
+
+.section-title p{
+    color:var(--muted);
+    font-size:0.85rem;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+    gap:16px;
+}
+
+.card{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:20px;
+    padding:20px;
+    min-height:168px;
+    transition:0.25s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+    border-color:rgba(255,77,77,0.18);
+    box-shadow:0 18px 50px rgba(0,0,0,0.32);
+}
+
+.card .icon{
+    width:42px;
+    height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:14px;
+    background:rgba(255,77,77,0.14);
+    color:var(--red2);
+    font-weight:700;
+    margin-bottom:16px;
+}
+
+.card h3{
+    font-size:0.98rem;
+    margin-bottom:10px;
+}
+
+.card p{
+    color:var(--muted);
+    font-size:0.84rem;
+    line-height:1.7;
+}
+
+.insight{
+    border:1px solid rgba(255,77,77,0.14);
+    background:linear-gradient(135deg,rgba(255,77,77,0.1),rgba(255,255,255,0.025));
+    border-radius:22px;
+    padding:24px;
+}
+
+.tag{
+    display:inline-flex;
+    color:var(--red2);
+    background:rgba(255,77,77,0.12);
+    border:1px solid rgba(255,77,77,0.18);
+    font-size:0.78rem;
+    font-weight:700;
+    padding:6px 12px;
+    border-radius:999px;
+    margin-bottom:12px;
+}
+
+.insight p{
+    margin-top:10px;
+    color:var(--muted);
+    line-height:1.8;
+}
+
+.brief-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:16px;
+    margin-top:18px;
+}
+
+.brief-box{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:18px;
+    padding:18px;
+}
+
+.brief-box h3{
+    font-size:0.98rem;
+    margin-bottom:10px;
+}
+
+.brief-box p{
+    margin-top:0;
+    font-size:0.84rem;
+}
+
+.action-list{
+    margin-top:18px;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+}
+
+.action{
+    padding:14px 16px;
+    border-radius:16px;
+    background:rgba(255,77,77,0.08);
+    border:1px solid rgba(255,77,77,0.12);
+    color:#d8d8d8;
+    font-size:0.86rem;
+    line-height:1.7;
+}
+
+@media(max-width:1050px){
+    .grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .hero{ grid-template-columns:1fr; }
+    .brief-grid{ grid-template-columns:1fr; }
+}
+
+@media(max-width:900px){
+    body{ overflow:auto; }
+    .app{ display:block; }
+    .sidebar{ display:none; }
+    .main{ height:auto; min-height:100vh; }
+    .topbar{ padding:0 18px; }
+    .top-actions{ gap:8px; }
+    .content{ padding:24px 16px 34px; }
+    .hero,
+    .section,
+    .hero-copy,
+    .status-card,
+    .insight{
+        width:100%;
+        max-width:100%;
+    }
+}
+
+@media(max-width:640px){
+    .grid,
+    .metric-grid,
+    .action-list{ grid-template-columns:1fr; }
+    .hero-copy,
+    .status-card{ border-radius:18px; padding:22px; }
+    .topbar{
+        height:auto;
+        min-height:74px;
+        align-items:flex-start;
+        flex-wrap:wrap;
+        gap:12px;
+        padding-top:14px;
+        padding-bottom:14px;
+    }
+    .top-actions{
+        width:100%;
+        flex-wrap:wrap;
+        justify-content:flex-start;
+    }
+    .top-title{ font-size:0.9rem; }
+    .hero-copy p,
+    .weather-meta{
+        max-width:min(285px, 100%);
+    }
+    .ghost-btn,
+    .primary-btn,
+    .lang-select{ padding:9px 12px; font-size:0.78rem; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+    <aside class="sidebar">
+        <div>
+            <div class="logo">
+                <div class="logo-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#080808" stroke-width="2.2">
+                        <path d="M12 2C6 2 3 7 3 12c0 3.5 2 6.5 5 8 0-4 2-8 4-10-1 3-1 7 0 10 3-1.5 5-4.5 5-8 0-5-2-10-5-10z"/>
+                    </svg>
+                </div>
+                <div class="logo-text">KHETFLIX</div>
+            </div>
+
+            <nav class="menu" aria-label="Main navigation">
+                <a class="menu-item active" href="/home"><span>H</span><strong data-i18n="navHome">Home</strong></a>
+                <a class="menu-item" href="/chatbot"><span>C</span><strong data-i18n="navChatbot">Chatbot</strong></a>
+                <a class="menu-item" href="/voicebot"><span>V</span><strong data-i18n="navVoicebot">Voicebot</strong></a>
+                <a class="menu-item" href="/progressive-feedback"><span>P</span><strong>Progressive Feedback</strong></a>
+                <a class="menu-item" href="/scheme-finder"><span>S</span><strong>Scheme Finder</strong></a>
+                <a class="menu-item" href="/login"><span>L</span><strong data-i18n="navLogout">Logout</strong></a>
+            </nav>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="pulse"></div>
+            <div data-i18n="aiOnline">Khetflix AI Online</div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div class="top-title" data-i18n="topTitle">Khetflix Farmer Dashboard</div>
+            <div class="top-actions">
+                <select class="lang-select" id="languageSelect" aria-label="Change website language">
+                    <option value="en">English</option>
+                    <option value="kn">ಕನ್ನಡ</option>
+                    <option value="hi">हिन्दी</option>
+                    <option value="ta">தமிழ்</option>
+                </select>
+                <a class="ghost-btn" href="/chatbot" data-i18n="navChatbot">Chatbot</a>
+                <a class="primary-btn" href="/voicebot" data-i18n="navVoicebot">Voicebot</a>
+                <a class="ghost-btn" href="/progressive-feedback">Progressive Feedback</a>
+                <a class="ghost-btn" href="/scheme-finder">Scheme Finder</a>
+            </div>
+        </header>
+
+        <div class="content">
+            <section class="hero">
+                <div class="hero-copy">
+                    <div class="eyebrow" data-i18n="heroEyebrow">AI-powered farming intelligence</div>
+                    <h1 data-i18n-html="heroTitle">Plan smarter. <span>Grow profitably.</span></h1>
+                    <p data-i18n="heroText">
+                        Use Khetflix to build a crop plan from your land, water, soil, budget,
+                        season, market access, and risk profile. Start with the chatbot or use
+                        voice guidance when you want hands-free help.
+                    </p>
+                    <div class="hero-actions">
+                        <a class="primary-btn" href="/chatbot" data-i18n="startChat">Start AI Chat</a>
+                        <a class="ghost-btn" href="/voicebot" data-i18n="useVoice">Use Voice AI</a>
+                        <a class="ghost-btn" href="/progressive-feedback">Analyze Crop Photo</a>
+                        <a class="ghost-btn" href="/scheme-finder">Find Schemes</a>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div>
+                        <h2 data-i18n="weatherTitle">Live weather and timing</h2>
+                        <div class="weather-line" id="weatherTemp" data-i18n="checkingWeather">Checking weather...</div>
+                        <div class="weather-meta" id="weatherInfo">
+                            Loading today's exact time and local farm conditions.
+                        </div>
+                    </div>
+                    <div class="metric-grid">
+                        <div class="metric"><b id="timeNow">--:--</b><span data-i18n="timeLabel">exact local time now</span></div>
+                        <div class="metric"><b id="rainNow">--</b><span data-i18n="rainLabel">rain condition today</span></div>
+                        <div class="metric"><b id="windNow">--</b><span data-i18n="windLabel">wind speed</span></div>
+                        <div class="metric"><b id="weatherPlace">Local</b><span data-i18n="placeLabel">weather location</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-title">
+                    <div>
+                        <h2 data-i18n="quickTitle">Quick actions</h2>
+                        <p data-i18n="quickText">Move directly into the core Khetflix tools.</p>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <article class="card">
+                        <div class="icon">AI</div>
+                        <h3 data-i18n="card1Title">Crop strategy</h3>
+                        <p data-i18n="card1Text">Answer guided questions and get profitable crop recommendations for your conditions.</p>
+                    </article>
+                    <article class="card">
+                        <div class="icon">MR</div>
+                        <h3 data-i18n="card2Title">Market thinking</h3>
+                        <p data-i18n="card2Text">Plan for crops that match local demand, transport limits, and selling options.</p>
+                    </article>
+                    <article class="card">
+                        <div class="icon">WT</div>
+                        <h3 data-i18n="card3Title">Weather timing</h3>
+                        <p data-i18n="card3Text">Use seasonal planning to avoid poor spraying, irrigation, and harvest timing decisions.</p>
+                    </article>
+                    <article class="card">
+                        <div class="icon">RP</div>
+                        <h3 data-i18n="card4Title">Roadmap report</h3>
+                        <p data-i18n="card4Text">After choosing a crop, download a complete farming roadmap from the chatbot.</p>
+                    </article>
+                    <article class="card">
+                        <div class="icon">PF</div>
+                        <h3>Progressive feedback</h3>
+                        <p>Upload crop photos with field notes and get AI suggestions for disease, pest, nutrient, and stress issues.</p>
+                    </article>
+                    <article class="card">
+                        <div class="icon">GS</div>
+                        <h3>Scheme finder</h3>
+                        <p>Search farmer government schemes by crop support, irrigation, subsidy, insurance, and equipment.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="insight">
+                    <div class="tag" data-i18n="briefTag">AI Current Affairs Brief - May 12, 2026</div>
+                    <h2 data-i18n="briefTitle">What today's AI and finance news means for farmers</h2>
+                    <p data-i18n="briefIntro">
+                        Agriculture is moving into a data-first phase. India is pushing farmer-facing
+                        AI through Bharat-VISTAAR, the Digital Agriculture Mission, AI-enabled crop
+                        insurance tools, satellite crop monitoring, and regional-language advisory
+                        systems. For farmers, this means crop planning will increasingly depend on
+                        weather alerts, soil records, mandi signals, pest warnings, digital land data,
+                        and credit history instead of only guesswork or tradition.
+                    </p>
+                    <div class="brief-grid">
+                        <div class="brief-box">
+                            <h3 data-i18n="brief1Title">AI advisory is becoming mainstream</h3>
+                            <p data-i18n="brief1Text">
+                                Government and research-backed systems are moving toward multilingual
+                                crop advice, weather alerts, pest guidance, and market intelligence.
+                                Farmers should start treating digital advisory as a second opinion:
+                                useful for comparison, but best when checked against local soil,
+                                water, and village-level experience.
+                            </p>
+                        </div>
+                        <div class="brief-box">
+                            <h3 data-i18n="brief2Title">Finance is becoming data-based</h3>
+                            <p data-i18n="brief2Text">
+                                Credit and insurance decisions are shifting toward digital records,
+                                satellite imagery, crop history, input purchases, and mandi receipts.
+                                A farmer who keeps clean records can look less risky to lenders and
+                                may be better prepared for Kisan Credit Card renewal, insurance claims,
+                                FPO loans, and equipment subsidy applications.
+                            </p>
+                        </div>
+                        <div class="brief-box">
+                            <h3 data-i18n="brief3Title">Climate risk is the real pressure</h3>
+                            <p data-i18n="brief3Text">
+                                Extreme rain, heat, drought, and pest movement are making fixed
+                                calendar farming less reliable. Farmers should plan sowing, spraying,
+                                irrigation, fertilizer, and harvest windows around live weather instead
+                                of dates alone. Weather timing can protect both yield and cash flow.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="action-list">
+                        <div class="action" data-i18n="action1">
+                            Finance: keep bills for seeds, fertilizer, pesticides, labor, transport,
+                            and mandi sale. Use those records before applying for KCC renewal, crop
+                            insurance, FPO credit, or small equipment loans.
+                        </div>
+                        <div class="action" data-i18n="action2">
+                            Farming: avoid betting the whole land on one crop. Use one main crop plus
+                            a lower-risk backup crop or intercrop where soil and water support it.
+                        </div>
+                        <div class="action" data-i18n="action3">
+                            AI usage: ask Khetflix for crop options, then verify the top three with
+                            local mandi prices, water availability, seed availability, and pest history.
+                        </div>
+                        <div class="action" data-i18n="action4">
+                            Weather: if rain or strong wind is expected, delay pesticide spraying and
+                            foliar nutrition. Focus on drainage, staking, mulching, and disease scouting.
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+<script>
+const timeNow = document.getElementById("timeNow");
+const weatherTemp = document.getElementById("weatherTemp");
+const weatherInfo = document.getElementById("weatherInfo");
+const rainNow = document.getElementById("rainNow");
+const windNow = document.getElementById("windNow");
+const weatherPlace = document.getElementById("weatherPlace");
+const languageSelect = document.getElementById("languageSelect");
+
+let currentLang = localStorage.getItem("khetflix_home_lang") || "en";
+
+const translations = {
+    en: {
+        navHome:"Home", navChatbot:"Chatbot", navVoicebot:"Voicebot", navLogout:"Logout", aiOnline:"Khetflix AI Online", topTitle:"Khetflix Farmer Dashboard",
+        heroEyebrow:"AI-powered farming intelligence", heroTitle:"Plan smarter. <span>Grow profitably.</span>", heroText:"Use Khetflix to build a crop plan from your land, water, soil, budget, season, market access, and risk profile. Start with the chatbot or use voice guidance when you want hands-free help.",
+        startChat:"Start AI Chat", useVoice:"Use Voice AI", weatherTitle:"Live weather and timing", checkingWeather:"Checking weather...", loadingWeather:"Loading today's exact time and local farm conditions.",
+        timeLabel:"exact local time now", rainLabel:"rain condition today", windLabel:"wind speed", placeLabel:"weather location", quickTitle:"Quick actions", quickText:"Move directly into the core Khetflix tools.",
+        card1Title:"Crop strategy", card1Text:"Answer guided questions and get profitable crop recommendations for your conditions.", card2Title:"Market thinking", card2Text:"Plan for crops that match local demand, transport limits, and selling options.", card3Title:"Weather timing", card3Text:"Use seasonal planning to avoid poor spraying, irrigation, and harvest timing decisions.", card4Title:"Roadmap report", card4Text:"After choosing a crop, download a complete farming roadmap from the chatbot.",
+        briefTag:"AI Current Affairs Brief - May 12, 2026", briefTitle:"What today's AI and finance news means for farmers", briefIntro:"Agriculture is moving into a data-first phase. India is pushing farmer-facing AI through Bharat-VISTAAR, the Digital Agriculture Mission, AI-enabled crop insurance tools, satellite crop monitoring, and regional-language advisory systems. For farmers, this means crop planning will increasingly depend on weather alerts, soil records, mandi signals, pest warnings, digital land data, and credit history instead of only guesswork or tradition.",
+        brief1Title:"AI advisory is becoming mainstream", brief1Text:"Government and research-backed systems are moving toward multilingual crop advice, weather alerts, pest guidance, and market intelligence. Farmers should treat digital advisory as a second opinion and verify it locally.", brief2Title:"Finance is becoming data-based", brief2Text:"Credit and insurance decisions are shifting toward digital records, satellite imagery, crop history, input purchases, and mandi receipts. Clean records help with KCC, insurance, FPO loans, and subsidy applications.", brief3Title:"Climate risk is the real pressure", brief3Text:"Extreme rain, heat, drought, and pest movement are making fixed calendar farming less reliable. Plan sowing, spraying, irrigation, fertilizer, and harvest windows around live weather.",
+        action1:"Finance: keep bills for seeds, fertilizer, pesticides, labor, transport, and mandi sale. Use those records before applying for KCC renewal, crop insurance, FPO credit, or small equipment loans.", action2:"Farming: avoid betting the whole land on one crop. Use one main crop plus a lower-risk backup crop or intercrop where soil and water support it.", action3:"AI usage: ask Khetflix for crop options, then verify the top three with local mandi prices, water availability, seed availability, and pest history.", action4:"Weather: if rain or strong wind is expected, delay pesticide spraying and foliar nutrition. Focus on drainage, staking, mulching, and disease scouting.",
+        noRain:"No rain", weatherUnavailable:"Weather unavailable", weatherError:"Check local weather before spraying, irrigation, fertilizer application, or harvest work.", yourArea:"Your area", bengaluru:"Bengaluru"
+    },
+    kn: {
+        navHome:"ಮುಖಪುಟ", navChatbot:"ಚಾಟ್‌ಬಾಟ್", navVoicebot:"ವಾಯ್ಸ್‌ಬಾಟ್", navLogout:"ಲಾಗ್‌ಔಟ್", aiOnline:"Khetflix AI ಆನ್‌ಲೈನ್", topTitle:"Khetflix ರೈತ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+        heroEyebrow:"AI ಆಧಾರಿತ ಕೃಷಿ ಬುದ್ಧಿವಂತಿಕೆ", heroTitle:"ಚಾಣಾಕ್ಷವಾಗಿ ಯೋಜಿಸಿ. <span>ಲಾಭವಾಗಿ ಬೆಳೆಸಿ.</span>", heroText:"ನಿಮ್ಮ ಜಮೀನು, ನೀರು, ಮಣ್ಣು, ಬಜೆಟ್, ಋತು, ಮಾರುಕಟ್ಟೆ ಪ್ರವೇಶ ಮತ್ತು ಅಪಾಯದ ಆಧಾರದಲ್ಲಿ ಬೆಳೆ ಯೋಜನೆ ಮಾಡಲು Khetflix ಬಳಸಿ.",
+        startChat:"AI ಚಾಟ್ ಪ್ರಾರಂಭಿಸಿ", useVoice:"ವಾಯ್ಸ್ AI ಬಳಸಿ", weatherTitle:"ಲೈವ್ ಹವಾಮಾನ ಮತ್ತು ಸಮಯ", checkingWeather:"ಹವಾಮಾನ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...", loadingWeather:"ಇಂದಿನ ನಿಖರ ಸಮಯ ಮತ್ತು ಸ್ಥಳೀಯ ಕೃಷಿ ಸ್ಥಿತಿ ಲೋಡ್ ಆಗುತ್ತಿದೆ.",
+        timeLabel:"ಈಗದ ಸ್ಥಳೀಯ ಸಮಯ", rainLabel:"ಇಂದಿನ ಮಳೆ ಸ್ಥಿತಿ", windLabel:"ಗಾಳಿಯ ವೇಗ", placeLabel:"ಹವಾಮಾನ ಸ್ಥಳ", quickTitle:"ತ್ವರಿತ ಕ್ರಮಗಳು", quickText:"ಮುಖ್ಯ Khetflix ಸಾಧನಗಳಿಗೆ ನೇರವಾಗಿ ಹೋಗಿ.",
+        card1Title:"ಬೆಳೆ ತಂತ್ರ", card1Text:"ಮಾರ್ಗದರ್ಶಿತ ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರಿಸಿ, ನಿಮ್ಮ ಪರಿಸ್ಥಿತಿಗೆ ಲಾಭದಾಯಕ ಬೆಳೆ ಸಲಹೆ ಪಡೆಯಿರಿ.", card2Title:"ಮಾರುಕಟ್ಟೆ ಯೋಚನೆ", card2Text:"ಸ್ಥಳೀಯ ಬೇಡಿಕೆ ಮತ್ತು ಮಾರಾಟ ಆಯ್ಕೆಗಳಿಗೆ ತಕ್ಕ ಬೆಳೆಗಳನ್ನು ಯೋಜಿಸಿ.", card3Title:"ಹವಾಮಾನ ಸಮಯ", card3Text:"ತಪ್ಪಾದ ಸಿಂಪಡಣೆ, ನೀರಾವರಿ ಮತ್ತು ಕೊಯ್ಲು ಸಮಯ ತಪ್ಪಿಸಲು ಹವಾಮಾನ ಯೋಜನೆ ಬಳಸಿ.", card4Title:"ರೋಡ್‌ಮ್ಯಾಪ್ ವರದಿ", card4Text:"ಬೆಳೆ ಆಯ್ಕೆ ಮಾಡಿದ ನಂತರ ಸಂಪೂರ್ಣ ಕೃಷಿ ರೋಡ್‌ಮ್ಯಾಪ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ.",
+        briefTag:"AI ಪ್ರಸ್ತುತ ವರದಿ - ಮೇ 12, 2026", briefTitle:"ಇಂದಿನ AI ಮತ್ತು ಹಣಕಾಸು ಸುದ್ದಿ ರೈತರಿಗೆ ಏನು ಹೇಳುತ್ತದೆ", briefIntro:"ಕೃಷಿ ಡೇಟಾ ಆಧಾರಿತ ಹಂತಕ್ಕೆ ಸಾಗುತ್ತಿದೆ. AI ಬೆಳೆ ವಿಮೆ, ಉಪಗ್ರಹ ನಿಗಾವಳಿ ಮತ್ತು ಪ್ರಾದೇಶಿಕ ಭಾಷಾ ಸಲಹೆಗಳು ರೈತರಿಗೆ ಹೆಚ್ಚು ಸಹಾಯ ಮಾಡುತ್ತಿವೆ.",
+        brief1Title:"AI ಸಲಹೆ ಸಾಮಾನ್ಯವಾಗುತ್ತಿದೆ", brief1Text:"ಬಹುಭಾಷಾ ಬೆಳೆ ಸಲಹೆ, ಹವಾಮಾನ ಎಚ್ಚರಿಕೆ, ಕೀಟ ಮಾರ್ಗದರ್ಶನ ಮತ್ತು ಮಾರುಕಟ್ಟೆ ಮಾಹಿತಿ ವೇಗವಾಗಿ ಬರುತ್ತಿವೆ.", brief2Title:"ಹಣಕಾಸು ಡೇಟಾ ಆಧಾರಿತವಾಗುತ್ತಿದೆ", brief2Text:"ಸಾಲ ಮತ್ತು ವಿಮೆ ನಿರ್ಧಾರಗಳು ಡಿಜಿಟಲ್ ದಾಖಲೆ, ಬೆಳೆ ಇತಿಹಾಸ ಮತ್ತು ಮಾರುಕಟ್ಟೆ ರಸೀದಿಗಳ ಕಡೆ ಸರಿಯುತ್ತಿವೆ.", brief3Title:"ಹವಾಮಾನ ಅಪಾಯ ದೊಡ್ಡ ಒತ್ತಡ", brief3Text:"ಮಳೆ, ಬಿಸಿಲು, ಬರ ಮತ್ತು ಕೀಟ ಚಲನೆಗಳಿಂದ ಕೃಷಿ ಅಪಾಯ ಹೆಚ್ಚುತ್ತಿದೆ. ಲೈವ್ ಹವಾಮಾನ ನೋಡಿ ಯೋಜಿಸಿ.",
+        action1:"ಹಣಕಾಸು: ಬೀಜ, ರಸಗೊಬ್ಬರ, ಕೀಟನಾಶಕ, ಕೂಲಿ, ಸಾಗಣೆ ಮತ್ತು ಮಾರಾಟದ ಬಿಲ್‌ಗಳನ್ನು ಇಡಿ.", action2:"ಕೃಷಿ: ಸಂಪೂರ್ಣ ಜಮೀನನ್ನು ಒಂದೇ ಬೆಳೆ ಮೇಲೆ ಪಣಕ್ಕಿಡಬೇಡಿ. ಒಂದು ಮುಖ್ಯ ಬೆಳೆ ಜೊತೆಗೆ ಕಡಿಮೆ ಅಪಾಯದ ಪರ್ಯಾಯ ಬೆಳೆ ಬಳಸಿ.", action3:"AI ಬಳಕೆ: Khetflix ನಿಂದ ಬೆಳೆ ಆಯ್ಕೆಗಳನ್ನು ಕೇಳಿ, ನಂತರ ಸ್ಥಳೀಯ ಬೆಲೆ, ನೀರು, ಬೀಜ ಮತ್ತು ಕೀಟ ಇತಿಹಾಸದೊಂದಿಗೆ ಪರಿಶೀಲಿಸಿ.", action4:"ಹವಾಮಾನ: ಮಳೆ ಅಥವಾ ಹೆಚ್ಚು ಗಾಳಿ ಇದ್ದರೆ ಸಿಂಪಡಣೆ ತಡಮಾಡಿ.",
+        noRain:"ಮಳೆ ಇಲ್ಲ", weatherUnavailable:"ಹವಾಮಾನ ಲಭ್ಯವಿಲ್ಲ", weatherError:"ಹೊಲದ ಕೆಲಸಕ್ಕೂ ಮೊದಲು ಸ್ಥಳೀಯ ಹವಾಮಾನ ಪರಿಶೀಲಿಸಿ.", yourArea:"ನಿಮ್ಮ ಪ್ರದೇಶ", bengaluru:"ಬೆಂಗಳೂರು"
+    },
+    hi: {
+        navHome:"होम", navChatbot:"चैटबॉट", navVoicebot:"वॉइसबॉट", navLogout:"लॉगआउट", aiOnline:"Khetflix AI ऑनलाइन", topTitle:"Khetflix किसान डैशबोर्ड",
+        heroEyebrow:"AI आधारित खेती बुद्धिमत्ता", heroTitle:"समझदारी से योजना बनाएं। <span>लाभ से उगाएं।</span>", heroText:"अपनी जमीन, पानी, मिट्टी, बजट, मौसम, बाजार पहुंच और जोखिम के आधार पर फसल योजना बनाने के लिए Khetflix का उपयोग करें.",
+        startChat:"AI चैट शुरू करें", useVoice:"वॉइस AI इस्तेमाल करें", weatherTitle:"लाइव मौसम और समय", checkingWeather:"मौसम जांच रहे हैं...", loadingWeather:"आज का सही समय और स्थानीय खेत की स्थिति लोड हो रही है.",
+        timeLabel:"अभी का स्थानीय समय", rainLabel:"आज बारिश की स्थिति", windLabel:"हवा की गति", placeLabel:"मौसम स्थान", quickTitle:"त्वरित काम", quickText:"मुख्य Khetflix टूल्स पर सीधे जाएं.",
+        card1Title:"फसल रणनीति", card1Text:"मार्गदर्शित सवालों का जवाब दें और अपनी स्थिति के लिए लाभदायक फसल सुझाव पाएं.", card2Title:"बाजार सोच", card2Text:"स्थानीय मांग और बिक्री विकल्पों से मेल खाने वाली फसलें चुनें.", card3Title:"मौसम टाइमिंग", card3Text:"गलत छिड़काव, सिंचाई और कटाई समय से बचने के लिए मौसम योजना बनाएं.", card4Title:"रोडमैप रिपोर्ट", card4Text:"फसल चुनने के बाद पूरा खेती रोडमैप डाउनलोड करें.",
+        briefTag:"AI करंट अफेयर्स ब्रीफ - 12 मई 2026", briefTitle:"आज की AI और वित्त खबर किसानों के लिए क्या मतलब रखती है", briefIntro:"कृषि डेटा-आधारित दौर में जा रही है। AI फसल बीमा, सैटेलाइट निगरानी और क्षेत्रीय भाषा सलाह किसानों की मदद कर रहे हैं.",
+        brief1Title:"AI सलाह आम हो रही है", brief1Text:"बहुभाषी फसल सलाह, मौसम अलर्ट, कीट मार्गदर्शन और बाजार जानकारी तेजी से बढ़ रही है.", brief2Title:"वित्त डेटा आधारित हो रहा है", brief2Text:"लोन और बीमा निर्णय डिजिटल रिकॉर्ड, फसल इतिहास और मंडी रसीदों पर जा रहे हैं.", brief3Title:"जलवायु जोखिम असली दबाव है", brief3Text:"तेज बारिश, गर्मी, सूखा और कीट बदलाव से खेती का जोखिम बढ़ रहा है। लाइव मौसम के हिसाब से योजना बनाएं.",
+        action1:"वित्त: बीज, खाद, कीटनाशक, मजदूरी, परिवहन और मंडी बिक्री के बिल रखें.", action2:"खेती: पूरी जमीन को एक ही फसल पर निर्भर न करें। एक मुख्य फसल के साथ कम जोखिम वाली बैकअप फसल रखें.", action3:"AI उपयोग: Khetflix से फसल विकल्प पूछें, फिर स्थानीय मंडी भाव, पानी, बीज और कीट इतिहास से जांचें.", action4:"मौसम: बारिश या तेज हवा हो तो छिड़काव रोकें.",
+        noRain:"बारिश नहीं", weatherUnavailable:"मौसम उपलब्ध नहीं", weatherError:"खेत के काम से पहले स्थानीय मौसम जांचें.", yourArea:"आपका क्षेत्र", bengaluru:"बेंगलुरु"
+    },
+    ta: {
+        navHome:"முகப்பு", navChatbot:"சாட்பாட்", navVoicebot:"வாய்ஸ்‌பாட்", navLogout:"வெளியேறு", aiOnline:"Khetflix AI ஆன்லைன்", topTitle:"Khetflix விவசாயி டாஷ்போர்டு",
+        heroEyebrow:"AI அடிப்படையிலான விவசாய அறிவு", heroTitle:"சரியாக திட்டமிடுங்கள். <span>லாபமாக வளருங்கள்.</span>", heroText:"உங்கள் நிலம், நீர், மண், பட்ஜெட், பருவம், சந்தை அணுகல் மற்றும் அபாயத்தை வைத்து பயிர் திட்டம் அமைக்க Khetflix பயன்படுத்துங்கள்.",
+        startChat:"AI சாட் தொடங்கு", useVoice:"வாய்ஸ் AI பயன்படுத்து", weatherTitle:"நேரடி வானிலை மற்றும் நேரம்", checkingWeather:"வானிலை பார்க்கப்படுகிறது...", loadingWeather:"இன்றைய சரியான நேரம் மற்றும் உள்ளூர் பண்ணை நிலை ஏற்றப்படுகிறது.",
+        timeLabel:"இப்போதைய உள்ளூர் நேரம்", rainLabel:"இன்றைய மழை நிலை", windLabel:"காற்று வேகம்", placeLabel:"வானிலை இடம்", quickTitle:"விரைவு செயல்கள்", quickText:"முக்கிய Khetflix கருவிகளுக்கு நேராக செல்லுங்கள்.",
+        card1Title:"பயிர் திட்டம்", card1Text:"வழிகாட்டும் கேள்விகளுக்கு பதில் அளித்து லாபமான பயிர் பரிந்துரைகள் பெறுங்கள்.", card2Title:"சந்தை சிந்தனை", card2Text:"உள்ளூர் தேவை மற்றும் விற்பனை வாய்ப்புகளுடன் பொருந்தும் பயிர்களை திட்டமிடுங்கள்.", card3Title:"வானிலை நேரம்", card3Text:"தவறான தெளிப்பு, பாசனம், அறுவடை நேரத்தை தவிர்க்க வானிலை திட்டத்தைப் பயன்படுத்துங்கள்.", card4Title:"ரோட்மேப் அறிக்கை", card4Text:"பயிரைத் தேர்ந்த பிறகு முழு விவசாய ரோட்மேப்பை பதிவிறக்குங்கள்.",
+        briefTag:"AI நடப்பு விவரம் - மே 12, 2026", briefTitle:"இன்றைய AI மற்றும் நிதி செய்திகள் விவசாயிகளுக்கு என்ன அர்த்தம்", briefIntro:"விவசாயம் தரவு அடிப்படையிலான கட்டத்திற்கு செல்கிறது. AI பயிர் காப்பீடு, செயற்கைக்கோள் கண்காணிப்பு மற்றும் பிராந்திய மொழி ஆலோசனைகள் உதவுகின்றன.",
+        brief1Title:"AI ஆலோசனை பொதுவாகிறது", brief1Text:"பல மொழி பயிர் ஆலோசனை, வானிலை எச்சரிக்கை, பூச்சி வழிகாட்டல் மற்றும் சந்தை தகவல் வளர்கிறது.", brief2Title:"நிதி தரவு அடிப்படையாகிறது", brief2Text:"கடன் மற்றும் காப்பீட்டு முடிவுகள் டிஜிட்டல் பதிவு, பயிர் வரலாறு மற்றும் சந்தை ரசீது நோக்கி மாறுகின்றன.", brief3Title:"காலநிலை அபாயம் பெரிய அழுத்தம்", brief3Text:"மழை, வெப்பம், வறட்சி மற்றும் பூச்சி மாற்றம் காரணமாக விவசாய அபாயம் அதிகரிக்கிறது.",
+        action1:"நிதி: விதை, உரம், பூச்சிக்கொல்லி, கூலி, போக்குவரத்து மற்றும் சந்தை விற்பனை ரசீதுகளை வைத்திருங்கள்.", action2:"விவசாயம்: முழு நிலத்தையும் ஒரே பயிரில் வைக்காதீர்கள். குறைந்த அபாய மாற்று பயிரை பயன்படுத்துங்கள்.", action3:"AI பயன்பாடு: Khetflix-ல் பயிர் விருப்பங்களை கேளுங்கள்; பின்னர் சந்தை விலை, நீர், விதை மற்றும் பூச்சி வரலாற்றுடன் சரிபாருங்கள்.", action4:"வானிலை: மழை அல்லது பல காற்று இருந்தால் தெளிப்பை தாமதப்படுத்துங்கள்.",
+        noRain:"மழை இல்லை", weatherUnavailable:"வானிலை கிடைக்கவில்லை", weatherError:"வயல் வேலையற்கு முன் உள்ளூர் வானிலை சரிபாருங்கள்.", yourArea:"உங்கள் பகுதி", bengaluru:"பெங்களூரு"
+    }
+};
+
+function t(key) {
+    return translations[currentLang][key] || translations.en[key] || key;
+}
+
+function applyLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem("khetflix_home_lang", lang);
+    languageSelect.value = lang;
+
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+        el.innerText = t(el.dataset.i18n);
+    });
+
+    document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+        el.innerHTML = t(el.dataset.i18nHtml);
+    });
+
+    if (weatherTemp.innerText.includes("Checking") || weatherTemp.innerText.includes("ಪರಿಶೀಲ") || weatherTemp.innerText.includes("जांच") || weatherTemp.innerText.includes("பார்க்க")) {
+        weatherTemp.innerText = t("checkingWeather");
+        weatherInfo.innerText = t("loadingWeather");
+    }
+}
+
+languageSelect.addEventListener("change", (event) => {
+    applyLanguage(event.target.value);
+});
+
+function updateClock() {
+    const now = new Date();
+    timeNow.innerText = now.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    });
+}
+
+function weatherCodeText(code) {
+    const map = {
+        0:"Clear", 1:"Mainly clear", 2:"Partly cloudy", 3:"Cloudy",
+        45:"Fog", 48:"Fog", 51:"Light drizzle", 53:"Drizzle", 55:"Heavy drizzle",
+        61:"Light rain", 63:"Rain", 65:"Heavy rain", 71:"Light snow",
+        80:"Rain showers", 81:"Rain showers", 82:"Heavy showers",
+        95:"Thunderstorm"
+    };
+    return map[code] || "Changing";
+}
+
+async function loadWeather(lat, lon, label) {
+    try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,precipitation,rain,weather_code,wind_speed_10m&timezone=auto`;
+        const response = await fetch(url);
+        const data = await response.json();
+        const current = data.current;
+        const condition = weatherCodeText(current.weather_code);
+
+        weatherTemp.innerText = `${Math.round(current.temperature_2m)}°C`;
+        weatherInfo.innerText = `${condition} at ${current.time}. Humidity ${current.relative_humidity_2m}%. Use this before irrigation, spraying, or field work.`;
+        rainNow.innerText = current.rain > 0 ? `${current.rain} mm` : t("noRain");
+        windNow.innerText = `${Math.round(current.wind_speed_10m)} km/h`;
+        weatherPlace.innerText = translations[currentLang][label] ? t(label) : label;
+    } catch (error) {
+        weatherTemp.innerText = t("weatherUnavailable");
+        weatherInfo.innerText = t("weatherError");
+    }
+}
+
+applyLanguage(currentLang);
+updateClock();
+setInterval(updateClock, 1000);
+
+if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+        (position) => loadWeather(position.coords.latitude, position.coords.longitude, "yourArea"),
+        () => loadWeather(12.9716, 77.5946, "bengaluru")
+    );
+} else {
+    loadWeather(12.9716, 77.5946, "bengaluru");
+}
+</script>
+</body>
+</html>

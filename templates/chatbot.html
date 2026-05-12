@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Khetflix Chat AI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:#050505;
+    --red:#ff4d4d;
+    --red2:#ff7b7b;
+    --text:#f5f5f5;
+    --muted:#989898;
+    --border:rgba(255,255,255,0.07);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+html{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+}
+
+body{
+    width:100%;
+    max-width:100%;
+    min-height:100vh;
+    min-height:100svh;
+    background:var(--bg);
+    color:var(--text);
+    overflow-x:hidden;
+}
+
+body::before,
+body::after{
+    content:'';
+    position:fixed;
+    border-radius:50%;
+    pointer-events:none;
+    filter:blur(80px);
+}
+
+body::before{
+    width:720px;
+    height:720px;
+    right:-260px;
+    top:-300px;
+    background:radial-gradient(circle,rgba(255,77,77,0.16),transparent 70%);
+    animation:glowFloat 9s ease-in-out infinite;
+}
+
+body::after{
+    width:560px;
+    height:560px;
+    left:-220px;
+    bottom:-240px;
+    background:radial-gradient(circle,rgba(255,123,123,0.09),transparent 70%);
+    animation:glowFloat2 11s ease-in-out infinite;
+}
+
+@keyframes glowFloat{
+    0%,100%{ transform:translate(0,0); }
+    50%{ transform:translate(-28px,38px); }
+}
+
+@keyframes glowFloat2{
+    0%,100%{ transform:translate(0,0); }
+    50%{ transform:translate(36px,-26px); }
+}
+
+.top-nav{
+    position:fixed;
+    top:18px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:10;
+    display:flex;
+    gap:10px;
+    padding:8px;
+    border-radius:18px;
+    background:rgba(12,12,12,0.82);
+    border:1px solid var(--border);
+    backdrop-filter:blur(18px);
+}
+
+.top-nav a{
+    color:#aaa;
+    text-decoration:none;
+    font-size:0.82rem;
+    font-weight:600;
+    padding:8px 12px;
+    border-radius:12px;
+    transition:0.25s;
+}
+
+.top-nav a:hover,
+.top-nav a.active{
+    color:white;
+    background:rgba(255,77,77,0.16);
+}
+
+.shell{
+    height:100vh;
+    height:100svh;
+    display:grid;
+    grid-template-columns:minmax(300px,0.72fr) minmax(420px,1.28fr);
+    gap:28px;
+    align-items:center;
+    padding:96px 48px 34px;
+    position:relative;
+    z-index:2;
+}
+
+.intro{
+    width:100%;
+    min-width:0;
+    max-width:560px;
+}
+
+.eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    color:var(--red2);
+    background:rgba(255,77,77,0.09);
+    border:1px solid rgba(255,77,77,0.18);
+    border-radius:999px;
+    padding:8px 14px;
+    font-size:0.78rem;
+    font-weight:700;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    margin-bottom:22px;
+}
+
+.live-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#00ff95;
+    box-shadow:0 0 18px #00ff95;
+    animation:dotPulse 1.8s infinite;
+}
+
+@keyframes dotPulse{
+    0%{ transform:scale(1); opacity:1; }
+    70%{ transform:scale(2); opacity:0; }
+    100%{ opacity:0; }
+}
+
+h1{
+    font-size:clamp(2.45rem,4.8vw,4.8rem);
+    line-height:1.04;
+    margin-bottom:22px;
+}
+
+h1 span{
+    background:linear-gradient(to right,var(--red),var(--red2));
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.subtitle{
+    color:#c8c8c8;
+    line-height:1.8;
+    font-size:1rem;
+    max-width:560px;
+    overflow-wrap:break-word;
+}
+
+.quick-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:26px;
+}
+
+.chip{
+    border:none;
+    color:#d8d8d8;
+    background:rgba(255,255,255,0.045);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:999px;
+    padding:10px 14px;
+    cursor:pointer;
+    transition:0.25s;
+}
+
+.chip:hover{
+    color:white;
+    border-color:rgba(255,77,77,0.26);
+    background:rgba(255,77,77,0.12);
+    transform:translateY(-2px);
+}
+
+.chat-card{
+    width:100%;
+    min-width:0;
+    height:min(650px, calc(100svh - 140px));
+    min-height:0;
+    border-radius:30px;
+    background:linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.025));
+    border:1px solid var(--border);
+    box-shadow:0 30px 90px rgba(0,0,0,0.44),0 0 60px rgba(255,77,77,0.08);
+    backdrop-filter:blur(22px);
+    padding:1px;
+    position:relative;
+    overflow:hidden;
+}
+
+.chat-card::before{
+    content:'';
+    position:absolute;
+    inset:-45%;
+    background:conic-gradient(from 180deg,transparent,rgba(255,77,77,0.12),transparent,rgba(255,123,123,0.08),transparent);
+    animation:spinAura 12s linear infinite;
+    opacity:0.75;
+}
+
+@keyframes spinAura{
+    to{ transform:rotate(360deg); }
+}
+
+.chat-inner{
+    position:relative;
+    z-index:1;
+    height:100%;
+    border-radius:29px;
+    background:linear-gradient(145deg,rgba(12,12,12,0.94),rgba(8,8,8,0.9));
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+}
+
+.chat-top{
+    min-height:74px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:18px 22px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    flex-shrink:0;
+}
+
+.chat-title{
+    min-width:0;
+}
+
+.chat-title b{
+    display:block;
+    font-size:1rem;
+    margin-bottom:4px;
+}
+
+.chat-title span{
+    color:var(--muted);
+    font-size:0.82rem;
+    overflow-wrap:break-word;
+}
+
+.chat-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-shrink:0;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+
+.status-pill,
+.tool-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:38px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.07);
+    background:rgba(255,255,255,0.045);
+    color:#d8d8d8;
+    font-size:0.82rem;
+    font-weight:600;
+    padding:8px 13px;
+}
+
+.tool-btn{
+    cursor:pointer;
+    transition:0.25s;
+}
+
+.tool-btn:hover{
+    color:white;
+    background:rgba(255,77,77,0.14);
+    border-color:rgba(255,77,77,0.24);
+}
+
+.online{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#00ff95;
+    box-shadow:0 0 16px #00ff95;
+    animation:dotPulse 1.8s infinite;
+}
+
+.pdf-btn{
+    display:none;
+}
+
+.chat-area{
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    padding:24px 22px 18px;
+}
+
+.messages{
+    max-width:900px;
+    margin:0 auto;
+}
+
+.message{
+    display:flex;
+    margin-bottom:18px;
+}
+
+.user{ justify-content:flex-end; }
+.bot{ justify-content:flex-start; }
+
+.bubble{
+    max-width:min(78%, 720px);
+    padding:15px 18px;
+    border-radius:22px;
+    line-height:1.75;
+    white-space:pre-wrap;
+    animation:fadeUp 0.28s ease;
+    overflow-wrap:anywhere;
+}
+
+.user .bubble{
+    background:linear-gradient(135deg,var(--red),var(--red2));
+    border-bottom-right-radius:8px;
+    box-shadow:0 0 28px rgba(255,77,77,0.26);
+}
+
+.bot .bubble{
+    background:rgba(255,255,255,0.045);
+    border:1px solid rgba(255,255,255,0.065);
+    border-bottom-left-radius:8px;
+    backdrop-filter:blur(20px);
+}
+
+@keyframes fadeUp{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:translateY(0); }
+}
+
+.typing{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    min-width:54px;
+    min-height:24px;
+}
+
+.typing span{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--red2);
+    animation:bounce 1.2s infinite;
+}
+
+.typing span:nth-child(2){ animation-delay:0.2s; }
+.typing span:nth-child(3){ animation-delay:0.4s; }
+
+@keyframes bounce{
+    0%,80%,100%{ transform:scale(0.45); opacity:0.4; }
+    40%{ transform:scale(1); opacity:1; }
+}
+
+.input-wrap{
+    padding:16px 20px 20px;
+    border-top:1px solid rgba(255,255,255,0.06);
+    background:linear-gradient(to top,rgba(0,0,0,0.42),rgba(0,0,0,0));
+    flex-shrink:0;
+}
+
+.input-box{
+    display:flex;
+    align-items:flex-end;
+    gap:12px;
+    padding:12px;
+    border-radius:24px;
+    background:rgba(255,255,255,0.045);
+    border:1px solid rgba(255,255,255,0.075);
+    box-shadow:0 18px 55px rgba(0,0,0,0.28);
+}
+
+textarea{
+    flex:1;
+    min-width:0;
+    min-height:34px;
+    max-height:150px;
+    background:transparent;
+    border:none;
+    outline:none;
+    resize:none;
+    color:white;
+    font-size:0.96rem;
+    line-height:1.6;
+    padding:5px 4px;
+}
+
+textarea::placeholder{
+    color:#777;
+}
+
+.send-btn{
+    width:50px;
+    height:50px;
+    border:none;
+    border-radius:17px;
+    background:linear-gradient(135deg,var(--red),var(--red2));
+    color:white;
+    font-size:1.25rem;
+    cursor:pointer;
+    transition:0.25s;
+    box-shadow:0 0 28px rgba(255,77,77,0.35);
+    flex-shrink:0;
+}
+
+.send-btn:hover{ transform:scale(1.06); }
+.send-btn:active{ transform:scale(0.94); }
+.send-btn:disabled{
+    opacity:0.45;
+    cursor:not-allowed;
+    transform:none;
+}
+
+.chat-area::-webkit-scrollbar,
+.prompt-scroll::-webkit-scrollbar{
+    width:6px;
+}
+
+.chat-area::-webkit-scrollbar-thumb,
+.prompt-scroll::-webkit-scrollbar-thumb{
+    background:rgba(255,77,77,0.35);
+    border-radius:20px;
+}
+
+@media(max-width:980px){
+    body{ overflow-y:auto; }
+    .shell{
+        height:auto;
+        min-height:100svh;
+        grid-template-columns:1fr;
+        padding:100px 20px 34px;
+    }
+    .intro{
+        text-align:center;
+        margin:auto;
+    }
+    .subtitle{
+        margin-left:auto;
+        margin-right:auto;
+    }
+    .quick-row{
+        justify-content:center;
+    }
+    .chat-card{
+        height:680px;
+        max-height:none;
+    }
+}
+
+@media(max-width:560px){
+    .top-nav{
+        left:12px;
+        right:12px;
+        width:auto;
+        transform:none;
+        justify-content:flex-start;
+        overflow-x:auto;
+        gap:4px;
+    }
+    .top-nav a{
+        padding:8px 9px;
+        font-size:0.75rem;
+    }
+    .shell{
+        padding-left:14px;
+        padding-right:14px;
+    }
+    .intro,
+    .chat-card{
+        width:calc(100vw - 28px);
+        max-width:calc(100vw - 28px);
+    }
+    h1{
+        width:min(300px, calc(100vw - 86px));
+        max-width:min(300px, calc(100vw - 86px));
+        margin-left:auto;
+        margin-right:auto;
+        font-size:2.32rem;
+        line-height:1.08;
+    }
+    .subtitle{
+        width:min(286px, calc(100vw - 92px));
+        max-width:min(286px, calc(100vw - 92px));
+        font-size:0.92rem;
+    }
+    .quick-row{
+        width:calc(100vw - 44px);
+        max-width:calc(100vw - 44px);
+        margin-left:auto;
+        margin-right:auto;
+        gap:8px;
+    }
+    .chip{
+        padding:9px 12px;
+    }
+    .chat-card{
+        height:650px;
+        border-radius:24px;
+    }
+    .chat-inner{
+        border-radius:23px;
+    }
+    .chat-top{
+        align-items:flex-start;
+        flex-direction:column;
+        padding:16px;
+    }
+    .chat-title{
+        width:100%;
+    }
+    .chat-title span{
+        display:block;
+        max-width:min(295px, calc(100vw - 70px));
+        line-height:1.55;
+    }
+    .chat-actions{
+        width:100%;
+        justify-content:flex-start;
+    }
+    .status-pill,
+    .tool-btn{
+        font-size:0.75rem;
+        padding:8px 10px;
+    }
+    .chat-area{
+        padding:18px 14px 14px;
+    }
+    .bubble{
+        max-width:92%;
+        padding:14px 15px;
+        font-size:0.9rem;
+    }
+    .input-wrap{
+        padding:12px;
+    }
+    .send-btn{
+        width:46px;
+        height:46px;
+    }
+}
+</style>
+</head>
+
+<body>
+<nav class="top-nav" aria-label="Main navigation">
+    <a href="/home">Home</a>
+    <a class="active" href="/chatbot">Chatbot</a>
+    <a href="/voicebot">Voicebot</a>
+    <a href="/progressive-feedback">Progressive Feedback</a>
+    <a href="/scheme-finder">Scheme Finder</a>
+    <a href="/login">Logout</a>
+</nav>
+
+<main class="shell">
+    <section class="intro">
+        <div class="eyebrow"><span class="live-dot"></span> Khetflix chat engine</div>
+        <h1>Plan crops<br>with <span>smart AI</span></h1>
+        <p class="subtitle">
+            Chat step-by-step with Khetflix to choose a language, describe your land,
+            compare crop options, and generate a farming roadmap you can download.
+        </p>
+
+        <div class="quick-row" aria-label="Quick prompts">
+            <button class="chip" type="button" onclick="quickSend('English')">English</button>
+            <button class="chip" type="button" onclick="quickSend('Kannada')">Kannada</button>
+            <button class="chip" type="button" onclick="quickSend('Hindi')">Hindi</button>
+            <button class="chip" type="button" onclick="quickSend('Tamil')">Tamil</button>
+        </div>
+    </section>
+
+    <section class="chat-card">
+        <div class="chat-inner">
+            <header class="chat-top">
+                <div class="chat-title">
+                    <b>Khetflix Farming Assistant</b>
+                    <span>Answer the questions. The AI will build your crop roadmap.</span>
+                </div>
+                <div class="chat-actions">
+                    <div class="status-pill"><span class="online"></span>AI Active</div>
+                    <button class="tool-btn pdf-btn" id="pdfBtn" type="button" onclick="downloadPDF()">Download PDF</button>
+                    <button class="tool-btn" id="sidebarPdfItem" type="button" style="display:none;" onclick="downloadPDF()">Report</button>
+                    <button class="tool-btn" type="button" onclick="resetSession()">Reset</button>
+                </div>
+            </header>
+
+            <div class="chat-area">
+                <div class="messages" id="messages"></div>
+            </div>
+
+            <div class="input-wrap">
+                <div class="input-box">
+                    <textarea id="input" rows="1" placeholder="Ask Khetflix AI..."></textarea>
+                    <button class="send-btn" id="sendBtn" type="button" onclick="sendMessage()">➤</button>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+const API_BASE = "http://127.0.0.1:5000";
+
+const session_id = "user_" + Math.floor(Math.random() * 999999);
+
+const messages = document.getElementById("messages");
+const input = document.getElementById("input");
+const sendBtn = document.getElementById("sendBtn");
+const pdfBtn = document.getElementById("pdfBtn");
+const sidebarPdfItem = document.getElementById("sidebarPdfItem");
+
+let isBusy = false;
+
+input.addEventListener("input", () => {
+    input.style.height = "34px";
+    input.style.height = Math.min(input.scrollHeight, 150) + "px";
+});
+
+function addMessage(text, type) {
+    const wrapper = document.createElement("div");
+    wrapper.className = `message ${type}`;
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.innerText = text;
+
+    wrapper.appendChild(bubble);
+    messages.appendChild(wrapper);
+    scrollBottom();
+}
+
+function showTyping() {
+    const wrapper = document.createElement("div");
+    wrapper.className = "message bot";
+    wrapper.id = "typing";
+    wrapper.innerHTML = `
+        <div class="bubble">
+            <div class="typing">
+                <span></span><span></span><span></span>
+            </div>
+        </div>`;
+    messages.appendChild(wrapper);
+    scrollBottom();
+}
+
+function removeTyping() {
+    const el = document.getElementById("typing");
+    if (el) el.remove();
+}
+
+function scrollBottom() {
+    const area = document.querySelector(".chat-area");
+    area.scrollTop = area.scrollHeight;
+}
+
+function setBusy(state) {
+    isBusy = state;
+    sendBtn.disabled = state;
+    input.disabled = state;
+}
+
+function quickSend(text) {
+    if (isBusy) return;
+    input.value = text;
+    sendMessage();
+}
+
+async function sendMessage() {
+    const text = input.value.trim();
+    if (!text || isBusy) return;
+
+    addMessage(text, "user");
+    input.value = "";
+    input.style.height = "34px";
+
+    setBusy(true);
+    showTyping();
+
+    try {
+        const response = await fetch(`${API_BASE}/chat`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: text, session_id })
+        });
+
+        const data = await response.json();
+
+        removeTyping();
+        setBusy(false);
+
+        if (data.error) {
+            addMessage("Error: " + data.error, "bot");
+            return;
+        }
+
+        addMessage(data.response, "bot");
+
+        if (data.type === "final_roadmap") {
+            pdfBtn.style.display = "inline-flex";
+            sidebarPdfItem.style.display = "inline-flex";
+        }
+    } catch (err) {
+        removeTyping();
+        setBusy(false);
+        addMessage(
+            "Server connection failed.\nMake sure Flask backend is running at:\n" + API_BASE,
+            "bot"
+        );
+    }
+}
+
+input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+
+async function downloadPDF() {
+    try {
+        const response = await fetch(`${API_BASE}/download_pdf`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ session_id })
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            alert("Could not download PDF: " + (err.error || "Unknown error"));
+            return;
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "khetflix_report.pdf";
+        a.click();
+        URL.revokeObjectURL(url);
+    } catch (err) {
+        alert("PDF download failed: " + err.message);
+    }
+}
+
+async function resetSession() {
+    if (!confirm("Reset your session and start over?")) return;
+
+    try {
+        await fetch(`${API_BASE}/reset`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ session_id })
+        });
+    } catch (_) {}
+
+    window.location.reload();
+}
+
+window.onload = async () => {
+    addMessage(
+`Welcome to Khetflix AI.
+
+I will help you build the most profitable farming strategy for your land.
+
+Let's begin step-by-step.`,
+        "bot"
+    );
+
+    showTyping();
+
+    try {
+        const response = await fetch(`${API_BASE}/chat`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: "start", session_id })
+        });
+
+        const data = await response.json();
+        removeTyping();
+
+        if (data.error) {
+            addMessage("Error: " + data.error, "bot");
+        } else {
+            addMessage(data.response, "bot");
+        }
+    } catch (err) {
+        removeTyping();
+        addMessage(
+            "Backend server not running.\nStart Flask with: python app.py",
+            "bot"
+        );
+    }
+};
+</script>
+</body>
+</html>

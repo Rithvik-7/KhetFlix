@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Khetflix — Plan Wisely. Profit Widely.</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+<style>
+    /* ───────────────────────────────── */
+/* SECTION */
+/* ───────────────────────────────── */
+
+section{
+  padding:110px 60px;
+}
+
+.section-title{
+  text-align:center;
+  margin-bottom:70px;
+}
+
+.section-tag{
+  color:var(--primary2);
+
+  font-size:0.8rem;
+  letter-spacing:0.12em;
+
+  text-transform:uppercase;
+
+  margin-bottom:14px;
+}
+
+.section-title h2{
+  font-family:var(--font-head);
+
+  font-size:clamp(2rem,4vw,3.2rem);
+
+  margin-bottom:18px;
+}
+
+.section-title p{
+  color:var(--muted);
+
+  max-width:720px;
+  margin:auto;
+
+  line-height:1.8;
+}
+
+/* ───────────────────────────────── */
+/* CARDS */
+/* ───────────────────────────────── */
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:26px;
+}
+
+.card{
+  background:linear-gradient(145deg,#181212,#110d0d);
+
+  border:1px solid rgba(255,255,255,0.05);
+
+  border-radius:28px;
+
+  padding:34px;
+
+  transition:0.4s;
+
+  position:relative;
+
+  overflow:hidden;
+}
+
+.card::before{
+  content:'';
+
+  position:absolute;
+
+  inset:0;
+
+  background:radial-gradient(circle at top,
+  rgba(255,77,77,0.08),
+  transparent 60%);
+
+  opacity:0;
+
+  transition:0.4s;
+}
+
+.card:hover{
+  transform:translateY(-10px) scale(1.02);
+
+  border-color:rgba(255,77,77,0.2);
+
+  box-shadow:0 20px 60px rgba(0,0,0,0.5);
+}
+
+.card:hover::before{
+  opacity:1;
+}
+
+.card-icon{
+  font-size:2rem;
+  margin-bottom:20px;
+}
+
+.card h3{
+  margin-bottom:12px;
+  font-size:1.15rem;
+}
+
+.card p{
+  color:var(--muted);
+
+  line-height:1.8;
+  font-size:0.92rem;
+}
+
+/* ───────────────────────────────── */
+/* FOOTER */
+/* ───────────────────────────────── */
+
+footer{
+  padding:36px 60px;
+
+  border-top:1px solid rgba(255,255,255,0.05);
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  flex-wrap:wrap;
+
+  gap:20px;
+}
+
+.footer-links{
+  display:flex;
+  gap:24px;
+}
+
+.footer-links a{
+  text-decoration:none;
+  color:var(--muted);
+
+  transition:0.3s;
+}
+
+.footer-links a:hover{
+  color:var(--primary2);
+}
+
+/* ───────────────────────────────── */
+/* RESPONSIVE */
+/* ───────────────────────────────── */
+
+@media(max-width:980px){
+
+  .hero{
+    grid-template-columns:1fr;
+    text-align:center;
+  }
+
+  .hero-left{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .nav-links{
+    display:none;
+  }
+
+  .hero-right{
+    margin-top:40px;
+  }
+}
+
+@media(max-width:600px){
+
+  .nav,
+  section,
+  footer,
+  .hero{
+    padding-left:24px;
+    padding-right:24px;
+  }
+
+  .main-card{
+    width:100%;
+  }
+
+  .hero h1{
+    font-size:3rem;
+  }
+}
+
+:root{
+  --bg:#080808;
+  --bg2:#111111;
+  --card:#151111;
+
+  --primary:#ff4d4d;
+  --primary2:#ff7b7b;
+
+  --text:#f5f5f5;
+  --muted:#988d8d;
+
+  --border:rgba(255,255,255,0.06);
+
+  --glow:0 0 35px rgba(255,77,77,0.28);
+
+  --font-head:'Playfair Display', serif;
+  --font-body:'Poppins', sans-serif;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  overflow-x:hidden;
+}
+
+::-webkit-scrollbar{
+  width:6px;
+}
+
+::-webkit-scrollbar-thumb{
+  background:var(--primary);
+}
+
+/* NAVBAR */
+
+.nav{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:1000;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  padding:18px 60px;
+
+  background:rgba(0,0,0,0.65);
+  backdrop-filter:blur(16px);
+
+  border-bottom:1px solid var(--border);
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.logo-box{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  box-shadow:var(--glow);
+}
+
+.logo-box svg{
+  width:20px;
+  height:20px;
+}
+
+.logo-text{
+  font-weight:700;
+  letter-spacing:0.15em;
+  font-size:1.1rem;
+
+  background:linear-gradient(to right,var(--primary),var(--primary2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.nav-links{
+  display:flex;
+  gap:36px;
+  list-style:none;
+}
+
+.nav-links a{
+  color:var(--muted);
+  text-decoration:none;
+  font-size:0.9rem;
+  transition:0.3s;
+}
+
+.nav-links a:hover{
+  color:var(--primary2);
+}
+
+.nav a{
+  text-decoration:none;
+}
+
+.login-btn{
+  border:none;
+  padding:12px 26px;
+
+  border-radius:999px;
+
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+
+  color:white;
+  font-weight:600;
+
+  cursor:pointer;
+
+  box-shadow:var(--glow);
+
+  transition:0.3s;
+}
+
+.login-btn:hover{
+  transform:translateY(-3px);
+}
+
+/* HERO */
+
+.hero{
+  min-height:100vh;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+
+  padding:140px 60px 80px;
+
+  gap:50px;
+
+  position:relative;
+}
+
+.hero::before{
+  content:'';
+  position:absolute;
+
+  width:700px;
+  height:700px;
+
+  background:radial-gradient(circle,
+  rgba(255,77,77,0.12) 0%,
+  transparent 70%);
+
+  top:-250px;
+  left:-200px;
+
+  filter:blur(60px);
+
+  animation:blob1 10s ease-in-out infinite;
+}
+
+.hero::after{
+  content:'';
+  position:absolute;
+
+  width:500px;
+  height:500px;
+
+  background:radial-gradient(circle,
+  rgba(255,145,77,0.08) 0%,
+  transparent 70%);
+
+  bottom:-200px;
+  right:-100px;
+
+  filter:blur(60px);
+
+  animation:blob2 12s ease-in-out infinite;
+}
+
+@keyframes blob1{
+  0%,100%{
+    transform:translate(0,0);
+  }
+
+  50%{
+    transform:translate(40px,-30px);
+  }
+}
+
+@keyframes blob2{
+  0%,100%{
+    transform:translate(0,0);
+  }
+
+  50%{
+    transform:translate(-30px,30px);
+  }
+}
+
+.hero-left{
+  position:relative;
+  z-index:2;
+}
+
+.tagline{
+  display:inline-block;
+
+  padding:8px 18px;
+
+  border-radius:999px;
+
+  background:rgba(255,77,77,0.08);
+
+  border:1px solid rgba(255,77,77,0.25);
+
+  color:var(--primary2);
+
+  font-size:0.8rem;
+  font-weight:600;
+  letter-spacing:0.08em;
+
+  margin-bottom:30px;
+}
+
+.hero h1{
+  font-family:var(--font-head);
+
+  font-size:clamp(3rem,6vw,5rem);
+
+  line-height:1.05;
+
+  margin-bottom:26px;
+}
+
+.hero h1 span{
+  background:linear-gradient(to right,var(--primary),var(--primary2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.hero-sub{
+  font-size:1.08rem;
+  color:#d5d5d5;
+
+  line-height:1.7;
+
+  max-width:620px;
+
+  margin-bottom:18px;
+}
+
+.hero-desc{
+  color:var(--muted);
+
+  line-height:1.9;
+
+  max-width:620px;
+
+  margin-bottom:40px;
+}
+
+.hero-left a{
+  text-decoration:none;
+}
+
+.hero-btn{
+  padding:15px 34px;
+
+  border:none;
+  border-radius:999px;
+
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+
+  color:white;
+  font-size:0.95rem;
+  font-weight:600;
+
+  cursor:pointer;
+
+  box-shadow:0 0 24px rgba(255,77,77,0.4);
+
+  transition:0.3s;
+
+  animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+  0%,100%{
+    box-shadow:0 0 20px rgba(255,77,77,0.3);
+  }
+
+  50%{
+    box-shadow:0 0 38px rgba(255,77,77,0.6);
+  }
+}
+
+.hero-btn:hover{
+  transform:translateY(-4px);
+}
+
+/* HERO RIGHT */
+
+.hero-right{
+  display:flex;
+  justify-content:center;
+  position:relative;
+  z-index:2;
+}
+
+.main-card{
+  width:430px;
+  height:500px;
+
+  background:
+  radial-gradient(circle at 50% 38%,rgba(255,77,77,0.18),transparent 34%),
+  linear-gradient(145deg,#181212,#100d0d);
+
+  border:1px solid rgba(255,255,255,0.06);
+
+  border-radius:32px;
+
+  position:relative;
+
+  overflow:hidden;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+
+  box-shadow:
+  0 40px 80px rgba(0,0,0,0.5),
+  0 0 50px rgba(255,77,77,0.12);
+}
+
+.main-card::before{
+  content:'';
+  position:absolute;
+  width:330px;
+  height:330px;
+  border-radius:50%;
+  border:1px solid rgba(255,77,77,0.16);
+  top:52px;
+  animation:haloBreathe 4s ease-in-out infinite;
+}
+
+.main-card::after{
+  content:'';
+  position:absolute;
+  width:76%;
+  height:1px;
+  bottom:112px;
+  background:linear-gradient(90deg,transparent,rgba(255,123,123,0.5),transparent);
+}
+
+/* CROP ANIMATION */
+
+.crop{
+  width:320px;
+  height:320px;
+  position:relative;
+  margin-top:8px;
+  display:grid;
+  place-items:center;
+}
+
+.crop svg{
+  width:100%;
+  height:100%;
+  display:block;
+  overflow:visible;
+}
+
+.crop-soil{
+  opacity:0;
+  transform-origin:center;
+  animation:soilAppear 0.7s ease-out 0.1s forwards;
+}
+
+.crop-stem{
+  stroke-dasharray:170;
+  stroke-dashoffset:170;
+  animation:drawStem 1.4s ease-out 0.45s forwards;
+}
+
+.crop-leaf,
+.crop-head,
+.crop-spark{
+  opacity:0;
+}
+
+.crop-leaf{
+  transform-box:fill-box;
+  transform-origin:center;
+}
+
+.leaf-left{
+  animation:leafFade 0.65s ease-out 1.2s forwards;
+}
+
+.leaf-right{
+  animation:leafFade 0.65s ease-out 1.45s forwards;
+}
+
+.leaf-top{
+  animation:leafFade 0.65s ease-out 1.7s forwards;
+}
+
+.crop-head{
+  transform-box:fill-box;
+  transform-origin:center bottom;
+  animation:headFade 0.75s ease-out 2s forwards;
+}
+
+.crop-spark{
+  animation:sparkFade 1.8s ease-in-out 2.35s infinite;
+}
+
+.crop-spark:nth-of-type(2){
+  animation-delay:2.65s;
+}
+
+@keyframes haloBreathe{
+  0%,100%{ transform:scale(0.94); opacity:0.45; }
+  50%{ transform:scale(1.04); opacity:0.9; }
+}
+
+@keyframes soilAppear{
+  from{ opacity:0; transform:scaleX(0.7); }
+  to{ opacity:1; transform:scaleX(1); }
+}
+
+@keyframes drawStem{
+  to{ stroke-dashoffset:0; }
+}
+
+@keyframes leafFade{
+  from{ opacity:0; transform:scale(0.92); }
+  to{ opacity:1; transform:scale(1); }
+}
+
+@keyframes headFade{
+  from{ opacity:0; transform:scale(0.9); }
+  to{ opacity:1; transform:scale(1); }
+}
+
+@keyframes sparkFade{
+  0%,100%{ opacity:0.25; transform:translateY(0); }
+  50%{ opacity:1; transform:translateY(-4px); }
+}
+
+.card-label{
+  margin-top:10px;
+
+  color:var(--primary2);
+
+  font-size:0.8rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+
+.card-title{
+  margin-top:10px;
+
+  font-family:var(--font-head);
+
+  font-size:1.4rem;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:980px){
+
+  .hero{
+    grid-template-columns:1fr;
+    text-align:center;
+  }
+
+  .hero-left{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .nav-links{
+    display:none;
+  }
+
+  .hero-right{
+    margin-top:40px;
+  }
+}
+
+@media(max-width:600px){
+
+  .nav,
+  .hero{
+    padding-left:24px;
+    padding-right:24px;
+  }
+
+  .main-card{
+    width:100%;
+  }
+
+  .hero h1{
+    font-size:3rem;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+
+<nav class="nav">
+
+  <div class="logo">
+
+    <div class="logo-box">
+
+      <svg viewBox="0 0 24 24" fill="none" stroke="#080808" stroke-width="2.2">
+        <path d="M12 2C6 2 3 7 3 12c0 3.5 2 6.5 5 8 0-4 2-8 4-10-1 3-1 7 0 10 3-1.5 5-4.5 5-8 0-5-2-10-5-10z"/>
+      </svg>
+
+    </div>
+
+    <div class="logo-text">
+      KHETFLIX
+    </div>
+
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#features">AI Features</a></li>
+  </ul>
+
+  <!-- LOGIN BUTTON FIXED -->
+
+  <a href="/login">
+    <button class="login-btn">
+      Login
+    </button>
+  </a>
+
+</nav>
+
+<!-- HERO -->
+
+<section class="hero">
+
+  <div class="hero-left">
+
+    <div class="tagline">
+      PLAN WISELY • PROFIT WIDELY
+    </div>
+
+    <h1>
+      Plan Wisely.<br>
+      <span>Profit Widely.</span>
+    </h1>
+
+    <p class="hero-sub">
+      AI-powered crop guidance technology focused on profit-driven farming decisions.
+    </p>
+
+    <p class="hero-desc">
+      Khetflix helps farmers make smarter decisions using AI-powered crop intelligence,
+      real-time market insights, and smart recommendations focused on maximizing yield and profit.
+    </p>
+
+    <!-- HERO LOGIN BUTTON FIXED -->
+
+    <a href="/login">
+      <button class="hero-btn">
+        Login
+      </button>
+    </a>
+
+  </div>
+
+  <div class="hero-right">
+
+    <div class="main-card">
+
+      <div class="crop">
+
+        <svg viewBox="0 0 260 260" role="img" aria-label="Growing crop animation">
+          <defs>
+            <linearGradient id="stemGradient" x1="0" x2="0" y1="1" y2="0">
+              <stop offset="0%" stop-color="#ff4d4d"/>
+              <stop offset="72%" stop-color="#ff7b7b"/>
+              <stop offset="100%" stop-color="#ffd0d0"/>
+            </linearGradient>
+            <linearGradient id="leafGradient" x1="0" x2="1" y1="1" y2="0">
+              <stop offset="0%" stop-color="#ff4d4d"/>
+              <stop offset="100%" stop-color="#ff9696"/>
+            </linearGradient>
+            <filter id="cropGlow" x="-40%" y="-40%" width="180%" height="180%">
+              <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#ff4d4d" flood-opacity="0.45"/>
+            </filter>
+          </defs>
+
+          <ellipse class="crop-soil" cx="130" cy="224" rx="86" ry="18" fill="rgba(255,77,77,0.22)"/>
+          <path class="crop-stem" d="M130 220 C130 180 128 150 130 112 C132 82 132 58 130 34" fill="none" stroke="url(#stemGradient)" stroke-width="8" stroke-linecap="round" filter="url(#cropGlow)"/>
+
+          <path class="crop-leaf leaf-left" d="M126 150 C91 130 69 132 48 153 C78 165 103 166 126 150Z" fill="url(#leafGradient)" filter="url(#cropGlow)"/>
+          <path class="crop-leaf leaf-right" d="M134 124 C169 101 195 103 216 128 C184 139 157 141 134 124Z" fill="url(#leafGradient)" filter="url(#cropGlow)"/>
+          <path class="crop-leaf leaf-top" d="M130 82 C105 61 85 58 65 75 C87 91 109 95 130 82Z" fill="url(#leafGradient)" filter="url(#cropGlow)"/>
+
+          <g class="crop-head" filter="url(#cropGlow)">
+            <ellipse cx="130" cy="28" rx="10" ry="22" fill="#ffd0d0"/>
+            <ellipse cx="112" cy="48" rx="9" ry="21" transform="rotate(-28 112 48)" fill="#ff8b8b"/>
+            <ellipse cx="148" cy="48" rx="9" ry="21" transform="rotate(28 148 48)" fill="#ff8b8b"/>
+            <ellipse cx="130" cy="58" rx="9" ry="21" fill="#ff7373"/>
+          </g>
+
+          <circle class="crop-spark" cx="74" cy="48" r="3" fill="#ffd0d0"/>
+          <circle class="crop-spark" cx="198" cy="76" r="3" fill="#ffd0d0"/>
+        </svg>
+
+      </div>
+
+      <div class="card-label">
+        KHETFLIX AI ENGINE
+      </div>
+
+      <div class="card-title">
+        Intelligent Farming Intelligence
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+<!-- OVERVIEW -->
+
+<section id="overview">
+
+  <div class="section-title">
+
+    <div class="section-tag">
+      PLATFORM OVERVIEW
+    </div>
+
+    <h2>
+      AI systems designed<br>
+      for profit-focused agriculture
+    </h2>
+
+    <p>
+      Smart AI modules working together to improve crop planning,
+      farming strategy, and profitability.
+    </p>
+
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+
+      <div class="card-icon">
+        🌾
+      </div>
+
+      <h3>
+        Crop Recommendation
+      </h3>
+
+      <p>
+        AI recommends the most profitable crops using soil quality,
+        seasonal conditions, and local farming patterns.
+      </p>
+
+    </div>
+
+    <div class="card">
+
+      <div class="card-icon">
+        🔬
+      </div>
+
+      <h3>
+        Disease Detection
+      </h3>
+
+      <p>
+        Upload a crop image and instantly detect diseases,
+        plant stress, and treatment recommendations.
+      </p>
+
+    </div>
+
+    <div class="card">
+
+      <div class="card-icon">
+        📊
+      </div>
+
+      <h3>
+        Smart Farming Strategy
+      </h3>
+
+      <p>
+        Get AI-generated farming strategies focused on maximizing
+        yield quality, profit, and resource optimization.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- FEATURES -->
+
+<section id="features">
+
+  <div class="section-title">
+
+    <div class="section-tag">
+      AI FEATURES
+    </div>
+
+    <h2>
+      Precision-built AI tools<br>
+      for modern agriculture
+    </h2>
+
+    <p>
+      Real farming problems require real intelligence.
+      Every Khetflix AI module is designed for practical agricultural decision-making.
+    </p>
+
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+
+      <div class="card-icon">
+        🌿
+      </div>
+
+      <h3>
+        Progressive Feedback
+      </h3>
+
+      <p>
+        Upload crop photos with farmer notes and receive AI-based
+        health observations, issue checks, and field suggestions.
+      </p>
+
+    </div>
+
+    <div class="card">
+
+      <div class="card-icon">
+        🌤️
+      </div>
+
+      <h3>
+        Weather Intelligence
+      </h3>
+
+      <p>
+        Hyper-local weather insights improve planting,
+        irrigation, and harvesting decisions.
+      </p>
+
+    </div>
+
+    <div class="card">
+
+      <div class="card-icon">
+        📈
+      </div>
+
+      <h3>
+        Market Demand Prediction
+      </h3>
+
+      <p>
+        Predict market trends early and focus on crops
+        with higher future profitability.
+      </p>
+
+    </div>
+
+    <div class="card">
+
+      <div class="card-icon">
+        🎙️
+      </div>
+
+      <h3>
+        Voice AI Assistant
+      </h3>
+
+      <p>
+        Ask farming questions in regional languages
+        using intelligent voice interaction.
+      </p>
+
+    </div>
+
+    <div class="card">
+
+      <div class="card-icon">
+        🧠
+      </div>
+
+      <h3>
+        Smart Crop Prediction
+      </h3>
+
+      <p>
+        Machine learning models analyze millions of
+        agricultural data points for better crop selection.
+      </p>
+
+    </div>
+
+    <div class="card">
+
+      <div class="card-icon">
+        🪱
+      </div>
+
+      <h3>
+        Soil Health Insights
+      </h3>
+
+      <p>
+        Receive nutrient analysis and soil improvement
+        recommendations from AI-powered systems.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- FOOTER -->
+
+<footer>
+
+  <div class="logo">
+
+    <div class="logo-box" style="width:34px;height:34px;">
+
+      <svg viewBox="0 0 24 24" fill="none" stroke="#080808" stroke-width="2.2">
+        <path d="M12 2C6 2 3 7 3 12c0 3.5 2 6.5 5 8 0-4 2-8 4-10-1 3-1 7 0 10 3-1.5 5-4.5 5-8 0-5-2-10-5-10z"/>
+      </svg>
+
+    </div>
+
+    <div class="logo-text" style="font-size:0.95rem;">
+      KHETFLIX
+    </div>
+
+  </div>
+
+  <div style="color:#888;font-size:0.85rem;">
+    © 2026 Khetflix. All rights reserved.
+  </div>
+
+  <div class="footer-links">
+    <a href="#">GitHub</a>
+    <a href="#">LinkedIn</a>
+    <a href="#">Contact</a>
+  </div>
+
+</footer>
+
+</body>
+</html>

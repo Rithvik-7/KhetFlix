@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Khetflix Scheme Finder</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:#050505;
+    --red:#ff4d4d;
+    --red2:#ff7b7b;
+    --text:#f5f5f5;
+    --muted:#989898;
+    --border:rgba(255,255,255,0.07);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+html{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+}
+
+body{
+    width:100%;
+    max-width:100%;
+    min-height:100vh;
+    min-height:100svh;
+    background:var(--bg);
+    color:var(--text);
+    overflow-x:hidden;
+}
+
+body::before,
+body::after{
+    content:'';
+    position:fixed;
+    border-radius:50%;
+    pointer-events:none;
+    filter:blur(80px);
+}
+
+body::before{
+    width:720px;
+    height:720px;
+    right:-260px;
+    top:-300px;
+    background:radial-gradient(circle,rgba(255,77,77,0.16),transparent 70%);
+    animation:glowFloat 9s ease-in-out infinite;
+}
+
+body::after{
+    width:560px;
+    height:560px;
+    left:-220px;
+    bottom:-240px;
+    background:radial-gradient(circle,rgba(255,123,123,0.09),transparent 70%);
+    animation:glowFloat2 11s ease-in-out infinite;
+}
+
+@keyframes glowFloat{
+    0%,100%{ transform:translate(0,0); }
+    50%{ transform:translate(-28px,38px); }
+}
+
+@keyframes glowFloat2{
+    0%,100%{ transform:translate(0,0); }
+    50%{ transform:translate(36px,-26px); }
+}
+
+.top-nav{
+    position:fixed;
+    top:18px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:10;
+    display:flex;
+    gap:10px;
+    padding:8px;
+    border-radius:18px;
+    background:rgba(12,12,12,0.82);
+    border:1px solid var(--border);
+    backdrop-filter:blur(18px);
+}
+
+.top-nav a{
+    color:#aaa;
+    text-decoration:none;
+    font-size:0.82rem;
+    font-weight:600;
+    padding:8px 12px;
+    border-radius:12px;
+    transition:0.25s;
+    white-space:nowrap;
+}
+
+.top-nav a:hover,
+.top-nav a.active{
+    color:white;
+    background:rgba(255,77,77,0.16);
+}
+
+.shell{
+    min-height:100vh;
+    min-height:100svh;
+    display:grid;
+    grid-template-columns:minmax(300px,0.7fr) minmax(460px,1.3fr);
+    gap:28px;
+    align-items:center;
+    padding:96px 48px 34px;
+    position:relative;
+    z-index:2;
+}
+
+.intro{
+    width:100%;
+    min-width:0;
+    max-width:590px;
+}
+
+.eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    color:var(--red2);
+    background:rgba(255,77,77,0.09);
+    border:1px solid rgba(255,77,77,0.18);
+    border-radius:999px;
+    padding:8px 14px;
+    font-size:0.78rem;
+    font-weight:700;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    margin-bottom:22px;
+}
+
+.live-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#00ff95;
+    box-shadow:0 0 18px #00ff95;
+    animation:dotPulse 1.8s infinite;
+}
+
+@keyframes dotPulse{
+    0%{ transform:scale(1); opacity:1; }
+    70%{ transform:scale(2); opacity:0; }
+    100%{ opacity:0; }
+}
+
+h1{
+    font-size:clamp(2.35rem,4.8vw,4.8rem);
+    line-height:1.04;
+    margin-bottom:22px;
+}
+
+h1 span{
+    background:linear-gradient(to right,var(--red),var(--red2));
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.subtitle{
+    color:#c8c8c8;
+    line-height:1.8;
+    font-size:1rem;
+    max-width:560px;
+    overflow-wrap:break-word;
+}
+
+.tips{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+    margin-top:26px;
+}
+
+.tip{
+    color:#d8d8d8;
+    background:rgba(255,255,255,0.045);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:16px;
+    padding:12px 14px;
+    line-height:1.65;
+    font-size:0.88rem;
+}
+
+.finder-card{
+    width:100%;
+    min-width:0;
+    height:min(720px, calc(100svh - 140px));
+    min-height:0;
+    border-radius:30px;
+    background:linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.025));
+    border:1px solid var(--border);
+    box-shadow:0 30px 90px rgba(0,0,0,0.44),0 0 60px rgba(255,77,77,0.08);
+    backdrop-filter:blur(22px);
+    padding:1px;
+    position:relative;
+    overflow:hidden;
+}
+
+.finder-card::before{
+    content:'';
+    position:absolute;
+    inset:-45%;
+    background:conic-gradient(from 180deg,transparent,rgba(255,77,77,0.12),transparent,rgba(255,123,123,0.08),transparent);
+    animation:spinAura 12s linear infinite;
+    opacity:0.75;
+}
+
+@keyframes spinAura{
+    to{ transform:rotate(360deg); }
+}
+
+.finder-inner{
+    position:relative;
+    z-index:1;
+    height:100%;
+    border-radius:29px;
+    background:linear-gradient(145deg,rgba(12,12,12,0.94),rgba(8,8,8,0.9));
+    display:grid;
+    grid-template-rows:auto auto minmax(0,1fr);
+    overflow:hidden;
+}
+
+.panel-top{
+    min-height:74px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:18px 22px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+}
+
+.panel-title b{
+    display:block;
+    font-size:1rem;
+    margin-bottom:4px;
+}
+
+.panel-title span{
+    color:var(--muted);
+    font-size:0.82rem;
+}
+
+.status-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:38px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.07);
+    background:rgba(255,255,255,0.045);
+    color:#d8d8d8;
+    font-size:0.82rem;
+    font-weight:600;
+    padding:8px 13px;
+    white-space:nowrap;
+}
+
+.online{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#00ff95;
+    box-shadow:0 0 16px #00ff95;
+}
+
+.tools{
+    padding:18px 22px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+}
+
+.search-box{
+    width:100%;
+    border:none;
+    outline:none;
+    color:white;
+    background:rgba(255,255,255,0.045);
+    border:1px solid rgba(255,255,255,0.075);
+    border-radius:18px;
+    padding:15px 16px;
+    font-size:0.95rem;
+    line-height:1.5;
+}
+
+.search-box::placeholder{
+    color:#777;
+}
+
+.filter-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:14px;
+}
+
+.filter-btn{
+    border:none;
+    color:#d8d8d8;
+    background:rgba(255,255,255,0.045);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:999px;
+    padding:9px 13px;
+    cursor:pointer;
+    font-size:0.8rem;
+    font-weight:700;
+    transition:0.25s;
+}
+
+.filter-btn:hover,
+.filter-btn.active{
+    color:white;
+    background:rgba(255,77,77,0.16);
+    border-color:rgba(255,77,77,0.28);
+}
+
+.scheme-area{
+    min-height:0;
+    overflow:auto;
+    padding:22px;
+}
+
+.scheme-count{
+    color:var(--muted);
+    font-size:0.84rem;
+    margin-bottom:14px;
+}
+
+.scheme-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+}
+
+.scheme-card{
+    min-width:0;
+    min-height:184px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.065);
+    border-radius:20px;
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    transition:0.25s;
+}
+
+.scheme-card:hover{
+    transform:translateY(-3px);
+    border-color:rgba(255,77,77,0.2);
+    box-shadow:0 18px 48px rgba(0,0,0,0.28);
+}
+
+.scheme-tag{
+    width:max-content;
+    max-width:100%;
+    color:var(--red2);
+    background:rgba(255,77,77,0.1);
+    border:1px solid rgba(255,77,77,0.18);
+    border-radius:999px;
+    padding:5px 10px;
+    font-size:0.72rem;
+    font-weight:800;
+}
+
+.scheme-card h3{
+    font-size:1rem;
+    line-height:1.35;
+}
+
+.scheme-card p{
+    color:#cfcfcf;
+    font-size:0.84rem;
+    line-height:1.65;
+}
+
+.eligibility{
+    margin-top:auto;
+    color:var(--muted);
+    font-size:0.78rem;
+    line-height:1.55;
+    padding-top:10px;
+    border-top:1px solid rgba(255,255,255,0.06);
+}
+
+.scheme-link{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:max-content;
+    max-width:100%;
+    margin-top:2px;
+    color:white;
+    text-decoration:none;
+    background:linear-gradient(135deg,var(--red),var(--red2));
+    border-radius:12px;
+    padding:9px 12px;
+    font-size:0.78rem;
+    font-weight:800;
+    box-shadow:0 0 22px rgba(255,77,77,0.2);
+    transition:0.25s;
+}
+
+.scheme-link:hover{
+    transform:translateY(-2px);
+    box-shadow:0 0 28px rgba(255,77,77,0.32);
+}
+
+.empty-state{
+    display:none;
+    color:#d8d8d8;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.065);
+    border-radius:20px;
+    padding:24px;
+    line-height:1.7;
+}
+
+.scheme-area::-webkit-scrollbar{
+    width:6px;
+}
+
+.scheme-area::-webkit-scrollbar-thumb{
+    background:rgba(255,77,77,0.35);
+    border-radius:20px;
+}
+
+@media(max-width:1040px){
+    body{ overflow-y:auto; }
+    .shell{
+        min-height:100svh;
+        grid-template-columns:1fr;
+        padding:100px 20px 34px;
+    }
+    .intro{
+        text-align:center;
+        margin:auto;
+    }
+    .subtitle{
+        margin-left:auto;
+        margin-right:auto;
+    }
+    .finder-card{
+        height:auto;
+        min-height:720px;
+    }
+}
+
+@media(max-width:720px){
+    .panel-top{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+    .scheme-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:560px){
+    .top-nav{
+        left:12px;
+        right:12px;
+        width:auto;
+        transform:none;
+        justify-content:flex-start;
+        overflow-x:auto;
+        gap:4px;
+    }
+    .top-nav a{
+        padding:8px 9px;
+        font-size:0.75rem;
+    }
+    .shell{
+        padding-left:14px;
+        padding-right:14px;
+    }
+    .intro,
+    .finder-card{
+        width:calc(100vw - 28px);
+        max-width:calc(100vw - 28px);
+    }
+    h1{
+        font-size:2.3rem;
+        width:min(320px, calc(100vw - 70px));
+        margin-left:auto;
+        margin-right:auto;
+    }
+    .subtitle{
+        width:min(310px, calc(100vw - 74px));
+        max-width:min(310px, calc(100vw - 74px));
+        font-size:0.92rem;
+    }
+    .tools,
+    .scheme-area{
+        padding:14px;
+    }
+}
+</style>
+</head>
+
+<body>
+<nav class="top-nav" aria-label="Main navigation">
+    <a href="/home">Home</a>
+    <a href="/chatbot">Chatbot</a>
+    <a href="/voicebot">Voicebot</a>
+    <a href="/progressive-feedback">Progressive Feedback</a>
+    <a class="active" href="/scheme-finder">Scheme Finder</a>
+    <a href="/login">Logout</a>
+</nav>
+
+<main class="shell">
+    <section class="intro">
+        <div class="eyebrow"><span class="live-dot"></span> Khetflix scheme search</div>
+        <h1>Find farmer schemes with <span>instant filters</span></h1>
+        <p class="subtitle">
+            Search agriculture-only government schemes by crop support, irrigation,
+            subsidy, insurance, and equipment. Type and filter together to quickly narrow the list.
+        </p>
+
+        <div class="tips">
+            <div class="tip">Search by scheme name, benefit, category, or eligibility keyword.</div>
+            <div class="tip">Use filters and search together, for example: Subsidy plus “drip”.</div>
+            <div class="tip">Check your state agriculture office or official portal before applying.</div>
+        </div>
+    </section>
+
+    <section class="finder-card">
+        <div class="finder-inner">
+            <header class="panel-top">
+                <div class="panel-title">
+                    <b>Farmer Government Scheme Finder</b>
+                    <span>Local agriculture scheme directory with real-time search and filters.</span>
+                </div>
+                <div class="status-pill"><span class="online"></span><span id="resultCountPill">Ready</span></div>
+            </header>
+
+            <div class="tools">
+                <input class="search-box" id="schemeSearch" type="search" placeholder="Search schemes, eligibility, irrigation, subsidy, crop, equipment..." autocomplete="off" />
+                <div class="filter-row" aria-label="Scheme category filters">
+                    <button class="filter-btn active" type="button" data-category="All">All</button>
+                    <button class="filter-btn" type="button" data-category="Crop Support">Crop Support</button>
+                    <button class="filter-btn" type="button" data-category="Irrigation">Irrigation</button>
+                    <button class="filter-btn" type="button" data-category="Subsidy">Subsidy</button>
+                    <button class="filter-btn" type="button" data-category="Insurance">Insurance</button>
+                    <button class="filter-btn" type="button" data-category="Equipment">Equipment</button>
+                </div>
+            </div>
+
+            <div class="scheme-area">
+                <div class="scheme-count" id="schemeCount"></div>
+                <div class="scheme-grid" id="schemeGrid"></div>
+                <div class="empty-state" id="emptyState">
+                    No agriculture schemes match your search and filter. Try another crop, benefit, or category.
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+const schemes = [
+    {
+        name: "Pradhan Mantri Fasal Bima Yojana",
+        description: "Crop insurance support against yield loss from natural calamities, pests, and diseases.",
+        category: "Insurance",
+        eligibility: "Farmers growing notified crops in notified areas."
+    },
+    {
+        name: "Kisan Credit Card Scheme",
+        description: "Short-term credit for crop cultivation, inputs, post-harvest needs, and allied agriculture expenses.",
+        category: "Crop Support",
+        eligibility: "Individual farmers, tenant farmers, sharecroppers, and self-help groups."
+    },
+    {
+        name: "PM-KISAN Income Support",
+        description: "Direct income support to eligible landholding farmer families for agricultural needs.",
+        category: "Crop Support",
+        eligibility: "Eligible small and marginal landholding farmer families."
+    },
+    {
+        name: "Pradhan Mantri Krishi Sinchayee Yojana",
+        description: "Support for better irrigation access, water-use efficiency, and field-level water management.",
+        category: "Irrigation",
+        eligibility: "Farmers and farmer groups needing irrigation development."
+    },
+    {
+        name: "Per Drop More Crop",
+        description: "Micro-irrigation support for drip and sprinkler systems to reduce water use.",
+        category: "Irrigation",
+        eligibility: "Farmers adopting drip or sprinkler irrigation on agricultural land."
+    },
+    {
+        name: "Soil Health Card Scheme",
+        description: "Soil testing and crop-wise nutrient recommendations for balanced fertilizer use.",
+        category: "Crop Support",
+        eligibility: "Farmers with cultivable land samples submitted for testing."
+    },
+    {
+        name: "Sub-Mission on Agricultural Mechanization",
+        description: "Assistance for farm machinery, custom hiring centers, and mechanized farming services.",
+        category: "Equipment",
+        eligibility: "Farmers, farmer groups, cooperatives, and custom hiring entrepreneurs."
+    },
+    {
+        name: "National Food Security Mission",
+        description: "Support for improving production of rice, wheat, pulses, coarse cereals, and nutri-cereals.",
+        category: "Crop Support",
+        eligibility: "Farmers in approved districts growing covered food crops."
+    },
+    {
+        name: "Rashtriya Krishi Vikas Yojana",
+        description: "State-led agriculture development support for productivity, infrastructure, and farmer income.",
+        category: "Subsidy",
+        eligibility: "Farmers covered under approved state agriculture projects."
+    },
+    {
+        name: "Mission for Integrated Development of Horticulture",
+        description: "Support for horticulture crops, nurseries, protected cultivation, storage, and post-harvest work.",
+        category: "Subsidy",
+        eligibility: "Farmers growing fruits, vegetables, spices, flowers, or plantation crops."
+    },
+    {
+        name: "National Mission on Oilseeds and Oil Palm",
+        description: "Crop support for oilseeds and oil palm area expansion, inputs, and productivity improvement.",
+        category: "Crop Support",
+        eligibility: "Farmers cultivating approved oilseed or oil palm crops."
+    },
+    {
+        name: "Agriculture Infrastructure Fund",
+        description: "Financing support for post-harvest infrastructure such as storage, grading, and primary processing.",
+        category: "Subsidy",
+        eligibility: "Farmers, FPOs, cooperatives, agri-entrepreneurs, and eligible institutions."
+    },
+    {
+        name: "National Bamboo Mission",
+        description: "Support for bamboo plantation, nurseries, processing, and market development.",
+        category: "Crop Support",
+        eligibility: "Farmers and groups taking up bamboo cultivation or processing."
+    },
+    {
+        name: "Farm Machinery Bank Support",
+        description: "Support for machinery banks that help farmers rent tractors, seeders, harvesters, and implements.",
+        category: "Equipment",
+        eligibility: "Farmer groups, FPOs, cooperatives, and rural entrepreneurs."
+    },
+    {
+        name: "Weather Based Crop Insurance Scheme",
+        description: "Insurance linked to weather parameters such as rainfall, temperature, humidity, and wind.",
+        category: "Insurance",
+        eligibility: "Farmers growing notified crops in weather-insurance notified areas."
+    }
+];
+
+const schemeGrid = document.getElementById("schemeGrid");
+const schemeSearch = document.getElementById("schemeSearch");
+const schemeCount = document.getElementById("schemeCount");
+const resultCountPill = document.getElementById("resultCountPill");
+const emptyState = document.getElementById("emptyState");
+const filterButtons = Array.from(document.querySelectorAll(".filter-btn"));
+
+let activeCategory = "All";
+
+function normalize(value) {
+    return value.toLowerCase().trim();
+}
+
+function schemeMatchesSearch(scheme, term) {
+    if (!term) return true;
+
+    const haystack = [
+        scheme.name,
+        scheme.description,
+        scheme.category,
+        scheme.eligibility
+    ].join(" ").toLowerCase();
+
+    return haystack.includes(term);
+}
+
+function renderSchemes() {
+    const term = normalize(schemeSearch.value);
+
+    const visibleSchemes = schemes.filter((scheme) => {
+        const categoryMatch = activeCategory === "All" || scheme.category === activeCategory;
+        return categoryMatch && schemeMatchesSearch(scheme, term);
+    });
+
+    schemeGrid.innerHTML = "";
+
+    visibleSchemes.forEach((scheme) => {
+        const card = document.createElement("article");
+        card.className = "scheme-card";
+        card.innerHTML = `
+            <div class="scheme-tag">${scheme.category}</div>
+            <h3>${scheme.name}</h3>
+            <p>${scheme.description}</p>
+            <div class="eligibility"><b>Eligibility:</b> ${scheme.eligibility}</div>
+            <a class="scheme-link" href="https://www.myscheme.gov.in/search?keyword=${encodeURIComponent(scheme.name)}" target="_blank" rel="noopener">View Scheme</a>
+        `;
+        schemeGrid.appendChild(card);
+    });
+
+    const countText = `${visibleSchemes.length} agriculture scheme${visibleSchemes.length === 1 ? "" : "s"} found`;
+    schemeCount.innerText = countText;
+    resultCountPill.innerText = visibleSchemes.length ? countText : "No matches";
+    emptyState.style.display = visibleSchemes.length ? "none" : "block";
+}
+
+filterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+        activeCategory = button.dataset.category;
+        filterButtons.forEach((btn) => btn.classList.toggle("active", btn === button));
+        renderSchemes();
+    });
+});
+
+schemeSearch.addEventListener("input", renderSchemes);
+
+renderSchemes();
+</script>
+</body>
+</html>

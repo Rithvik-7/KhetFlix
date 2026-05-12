@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Khetflix Voice AI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:#050505;
+    --panel:#0d0d0d;
+    --card:#141414;
+    --red:#ff4d4d;
+    --red2:#ff7b7b;
+    --text:#f5f5f5;
+    --muted:#969696;
+    --border:rgba(255,255,255,0.07);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+html{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+}
+
+body{
+    width:100%;
+    max-width:100%;
+    min-height:100vh;
+    min-height:100svh;
+    background:var(--bg);
+    color:var(--text);
+    overflow-x:hidden;
+    overflow-y:auto;
+}
+
+body::before,
+body::after{
+    content:'';
+    position:fixed;
+    border-radius:50%;
+    pointer-events:none;
+    filter:blur(80px);
+}
+
+body::before{
+    width:720px;
+    height:720px;
+    right:-260px;
+    top:-300px;
+    background:radial-gradient(circle,rgba(255,77,77,0.16),transparent 70%);
+    animation:glowFloat 9s ease-in-out infinite;
+}
+
+body::after{
+    width:560px;
+    height:560px;
+    left:-220px;
+    bottom:-240px;
+    background:radial-gradient(circle,rgba(255,123,123,0.09),transparent 70%);
+    animation:glowFloat2 11s ease-in-out infinite;
+}
+
+@keyframes glowFloat{
+    0%,100%{ transform:translate(0,0); }
+    50%{ transform:translate(-28px,38px); }
+}
+
+@keyframes glowFloat2{
+    0%,100%{ transform:translate(0,0); }
+    50%{ transform:translate(36px,-26px); }
+}
+
+.top-nav{
+    position:fixed;
+    top:18px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:10;
+    display:flex;
+    gap:10px;
+    padding:8px;
+    border-radius:18px;
+    background:rgba(12,12,12,0.82);
+    border:1px solid var(--border);
+    backdrop-filter:blur(18px);
+}
+
+.top-nav a{
+    color:#aaa;
+    text-decoration:none;
+    font-size:0.82rem;
+    font-weight:600;
+    padding:8px 12px;
+    border-radius:12px;
+    transition:0.25s;
+}
+
+.top-nav a:hover,
+.top-nav a.active{
+    color:white;
+    background:rgba(255,77,77,0.16);
+}
+
+.shell{
+    min-height:100vh;
+    min-height:100svh;
+    display:grid;
+    grid-template-columns:minmax(320px,0.95fr) minmax(360px,1.05fr);
+    gap:28px;
+    align-items:center;
+    padding:96px 48px 34px;
+    position:relative;
+    z-index:2;
+}
+
+.intro{
+    max-width:620px;
+    width:100%;
+    min-width:0;
+}
+
+.eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    color:var(--red2);
+    background:rgba(255,77,77,0.09);
+    border:1px solid rgba(255,77,77,0.18);
+    border-radius:999px;
+    padding:8px 14px;
+    font-size:0.78rem;
+    font-weight:700;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    margin-bottom:22px;
+}
+
+.live-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#00ff95;
+    box-shadow:0 0 18px #00ff95;
+    animation:dotPulse 1.8s infinite;
+}
+
+@keyframes dotPulse{
+    0%{ transform:scale(1); opacity:1; }
+    70%{ transform:scale(2); opacity:0; }
+    100%{ opacity:0; }
+}
+
+h1{
+    font-size:clamp(2.6rem,5vw,5rem);
+    line-height:1.03;
+    margin-bottom:22px;
+}
+
+h1 span{
+    background:linear-gradient(to right,var(--red),var(--red2));
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.subtitle{
+    color:#c8c8c8;
+    line-height:1.8;
+    font-size:1rem;
+    max-width:580px;
+    overflow-wrap:break-word;
+}
+
+.quick-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:26px;
+}
+
+.chip{
+    border:none;
+    color:#d8d8d8;
+    background:rgba(255,255,255,0.045);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:999px;
+    padding:10px 14px;
+    cursor:pointer;
+    transition:0.25s;
+}
+
+.chip:hover{
+    color:white;
+    border-color:rgba(255,77,77,0.26);
+    background:rgba(255,77,77,0.12);
+    transform:translateY(-2px);
+}
+
+.voice-card{
+    width:100%;
+    min-width:0;
+    min-height:0;
+    height:min(620px, calc(100svh - 140px));
+    max-height:680px;
+    border-radius:30px;
+    background:linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.025));
+    border:1px solid var(--border);
+    box-shadow:0 30px 90px rgba(0,0,0,0.44),0 0 60px rgba(255,77,77,0.08);
+    backdrop-filter:blur(22px);
+    padding:24px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    position:relative;
+    overflow:hidden;
+}
+
+.voice-card::before{
+    content:'';
+    position:absolute;
+    inset:-40%;
+    background:conic-gradient(from 180deg,transparent,rgba(255,77,77,0.14),transparent,rgba(255,123,123,0.08),transparent);
+    animation:spinAura 11s linear infinite;
+    opacity:0.7;
+}
+
+.voice-card::after{
+    content:'';
+    position:absolute;
+    inset:1px;
+    border-radius:29px;
+    background:linear-gradient(145deg,rgba(12,12,12,0.94),rgba(8,8,8,0.9));
+}
+
+@keyframes spinAura{
+    to{ transform:rotate(360deg); }
+}
+
+.voice-inner{
+    position:relative;
+    z-index:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+    text-align:center;
+    height:100%;
+    gap:10px;
+}
+
+.status-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    color:#cfcfcf;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:999px;
+    padding:10px 16px;
+    font-size:0.84rem;
+    min-height:42px;
+    max-width:100%;
+    text-align:center;
+}
+
+#status{
+    overflow-wrap:anywhere;
+}
+
+.status-light{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#777;
+    box-shadow:0 0 12px rgba(255,255,255,0.15);
+}
+
+.voice-card.recording .status-light{
+    background:#00ff95;
+    box-shadow:0 0 18px #00ff95;
+}
+
+.voice-card.processing .status-light,
+.voice-card.playing .status-light{
+    background:var(--red2);
+    box-shadow:0 0 18px rgba(255,77,77,0.8);
+}
+
+.orb-wrap{
+    width:clamp(210px, 23vw, 260px);
+    height:clamp(210px, 23vw, 260px);
+    display:grid;
+    place-items:center;
+    position:relative;
+    margin:12px 0 4px;
+    flex-shrink:0;
+}
+
+.ring{
+    position:absolute;
+    inset:0;
+    border-radius:50%;
+    border:1px solid rgba(255,77,77,0.18);
+    animation:ringBreathe 3.8s ease-in-out infinite;
+}
+
+.ring:nth-child(2){
+    inset:26px;
+    animation-delay:0.45s;
+}
+
+.ring:nth-child(3){
+    inset:52px;
+    animation-delay:0.9s;
+}
+
+.voice-card.recording .ring{
+    animation:ringRecord 1.35s ease-out infinite;
+}
+
+@keyframes ringBreathe{
+    0%,100%{ transform:scale(0.94); opacity:0.34; }
+    50%{ transform:scale(1.03); opacity:0.85; }
+}
+
+@keyframes ringRecord{
+    0%{ transform:scale(0.72); opacity:0.85; }
+    100%{ transform:scale(1.16); opacity:0; }
+}
+
+.mic{
+    width:132px;
+    height:132px;
+    border-radius:50%;
+    border:none;
+    color:white;
+    font-size:3.2rem;
+    cursor:pointer;
+    position:relative;
+    z-index:2;
+    background:
+        radial-gradient(circle at 35% 25%,rgba(255,255,255,0.35),transparent 22%),
+        linear-gradient(135deg,var(--red),var(--red2));
+    box-shadow:0 0 50px rgba(255,77,77,0.42), inset 0 -18px 34px rgba(0,0,0,0.2);
+    transition:0.25s;
+}
+
+.mic::before{
+    content:'';
+    position:absolute;
+    left:50%;
+    top:32px;
+    width:32px;
+    height:50px;
+    transform:translateX(-50%);
+    border-radius:22px;
+    background:#090909;
+    box-shadow:inset 0 0 0 6px rgba(255,255,255,0.08);
+}
+
+.mic::after{
+    content:'';
+    position:absolute;
+    left:50%;
+    top:86px;
+    width:48px;
+    height:26px;
+    transform:translateX(-50%);
+    border-bottom:8px solid #090909;
+    border-left:8px solid transparent;
+    border-right:8px solid transparent;
+    border-radius:0 0 28px 28px;
+}
+
+.mic:hover:not(:disabled){
+    transform:scale(1.06);
+    box-shadow:0 0 70px rgba(255,77,77,0.56), inset 0 -18px 34px rgba(0,0,0,0.2);
+}
+
+.mic:active:not(:disabled){
+    transform:scale(0.95);
+}
+
+.mic:disabled{
+    opacity:0.58;
+    cursor:not-allowed;
+}
+
+.voice-card.recording .mic{
+    animation:micListening 1s ease-in-out infinite;
+}
+
+@keyframes micListening{
+    0%,100%{ transform:scale(1); }
+    50%{ transform:scale(1.1); }
+}
+
+.waveform{
+    width:min(430px,100%);
+    height:64px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:7px;
+    margin:0 auto 2px;
+    padding:10px 18px;
+    border-radius:22px;
+    background:rgba(255,255,255,0.035);
+    border:1px solid rgba(255,255,255,0.055);
+}
+
+.bar{
+    width:9px;
+    flex:0 0 9px;
+    height:18px;
+    border-radius:999px;
+    background:linear-gradient(to top,var(--red),var(--red2));
+    opacity:0.38;
+    transition:height 0.08s linear, opacity 0.12s;
+}
+
+.voice-card.idle .bar{
+    animation:idleBars 1.8s ease-in-out infinite;
+}
+
+.voice-card.idle .bar:nth-child(2n){ animation-delay:0.18s; }
+.voice-card.idle .bar:nth-child(3n){ animation-delay:0.36s; }
+
+.voice-card.processing .bar,
+.voice-card.playing .bar{
+    animation:activeBars 0.9s ease-in-out infinite;
+}
+
+.voice-card.processing .bar:nth-child(2n),
+.voice-card.playing .bar:nth-child(2n){ animation-delay:0.14s; }
+.voice-card.processing .bar:nth-child(3n),
+.voice-card.playing .bar:nth-child(3n){ animation-delay:0.28s; }
+
+@keyframes idleBars{
+    0%,100%{ height:16px; opacity:0.28; }
+    50%{ height:38px; opacity:0.62; }
+}
+
+@keyframes activeBars{
+    0%,100%{ height:18px; opacity:0.38; }
+    50%{ height:52px; opacity:1; }
+}
+
+.prompt-card{
+    width:100%;
+    text-align:left;
+    background:rgba(255,255,255,0.035);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:22px;
+    padding:16px;
+    flex-shrink:0;
+}
+
+.prompt-label{
+    color:var(--red2);
+    font-size:0.76rem;
+    font-weight:700;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+}
+
+.prompt-text{
+    color:#d2d2d2;
+    line-height:1.7;
+    font-size:0.9rem;
+    min-height:44px;
+    max-height:92px;
+    overflow:auto;
+}
+
+.controls{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:2px;
+    flex-shrink:0;
+}
+
+.control-btn{
+    border:none;
+    color:#d8d8d8;
+    background:rgba(255,255,255,0.045);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:14px;
+    padding:9px 14px;
+    cursor:pointer;
+    text-decoration:none;
+    font-weight:600;
+    transition:0.25s;
+}
+
+.control-btn:hover{
+    color:white;
+    background:rgba(255,77,77,0.12);
+    border-color:rgba(255,77,77,0.24);
+}
+
+@media(max-width:980px){
+    body{ overflow:auto; }
+    .shell{
+        grid-template-columns:1fr;
+        padding:100px 20px 34px;
+    }
+    .intro{ text-align:center; margin:auto; }
+    .subtitle{ margin-left:auto; margin-right:auto; }
+    .quick-row{ justify-content:center; }
+    .voice-card{
+        height:auto;
+        min-height:570px;
+        max-height:none;
+    }
+}
+
+@media(max-width:560px){
+    .top-nav{
+        left:12px;
+        right:12px;
+        width:auto;
+        transform:none;
+        justify-content:flex-start;
+        overflow-x:auto;
+        gap:4px;
+    }
+    .top-nav a{ padding:8px 9px; font-size:0.75rem; }
+    .shell{ padding-left:14px; padding-right:14px; }
+    .intro,
+    .voice-card{
+        width:calc(100vw - 28px);
+        max-width:calc(100vw - 28px);
+    }
+    h1{
+        font-size:2.65rem;
+        overflow-wrap:normal;
+    }
+    h1 span{ display:block; }
+    .subtitle{
+        font-size:0.92rem;
+        width:min(320px, calc(100vw - 72px));
+        max-width:min(320px, calc(100vw - 72px));
+        margin-left:auto;
+        margin-right:auto;
+    }
+    .quick-row{
+        width:calc(100vw - 44px);
+        max-width:calc(100vw - 44px);
+        margin-left:auto;
+        margin-right:auto;
+        gap:8px;
+        justify-content:center;
+    }
+    .chip{ padding:9px 12px; }
+    .orb-wrap{ width:230px; height:230px; margin-top:12px; }
+    .waveform{
+        overflow:hidden;
+        gap:6px;
+        padding-left:12px;
+        padding-right:12px;
+    }
+    .bar{
+        width:8px;
+        flex-basis:8px;
+    }
+    .mic{ width:132px; height:132px; }
+    .mic::before{ top:32px; }
+    .mic::after{ top:86px; }
+    .voice-card{ padding:20px; border-radius:24px; }
+}
+</style>
+</head>
+
+<body>
+<nav class="top-nav" aria-label="Main navigation">
+    <a href="/home">Home</a>
+    <a href="/chatbot">Chatbot</a>
+    <a class="active" href="/voicebot">Voicebot</a>
+    <a href="/progressive-feedback">Progressive Feedback</a>
+    <a href="/scheme-finder">Scheme Finder</a>
+    <a href="/login">Logout</a>
+</nav>
+
+<main class="shell">
+    <section class="intro">
+        <div class="eyebrow"><span class="live-dot"></span> Khetflix voice engine</div>
+        <h1>Talk to your <span>farm AI</span></h1>
+        <p class="subtitle">
+            Tap the mic, speak naturally, and hear Khetflix guide you through crop planning,
+            language selection, finance thinking, weather timing, and farming decisions.
+        </p>
+
+        <div class="quick-row" aria-label="Quick language choices">
+            <button class="chip" type="button" onclick="sendTextChoice('English')">English</button>
+            <button class="chip" type="button" onclick="sendTextChoice('Kannada')">Kannada</button>
+            <button class="chip" type="button" onclick="sendTextChoice('Hindi')">Hindi</button>
+            <button class="chip" type="button" onclick="sendTextChoice('Tamil')">Tamil</button>
+        </div>
+    </section>
+
+    <section class="voice-card idle" id="voiceCard">
+        <div class="voice-inner">
+            <div class="status-pill">
+                <span class="status-light"></span>
+                <span id="status">Initializing session...</span>
+            </div>
+
+            <div class="orb-wrap">
+                <div class="ring"></div>
+                <div class="ring"></div>
+                <div class="ring"></div>
+                <button class="mic" id="micBtn" type="button" aria-label="Start voice recording"></button>
+            </div>
+
+            <div class="waveform" id="waveform" aria-hidden="true">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </div>
+
+            <div class="prompt-card">
+                <div class="prompt-label">Current prompt</div>
+                <div class="prompt-text" id="promptText">
+                    Loading the first farming question.
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="control-btn" type="button" onclick="resetVoiceSession()">Reset session</button>
+                <a class="control-btn" href="/chatbot">Open text chat</a>
+                <a class="control-btn" href="/progressive-feedback">Crop photo feedback</a>
+                <a class="control-btn" href="/scheme-finder">Find schemes</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+const API_BASE = "http://127.0.0.1:5000";
+
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+let activeStream = null;
+let audioContext = null;
+let analyser = null;
+let animationFrame = null;
+
+let session_id = "voice_" + Math.floor(Math.random() * 999999);
+
+const voiceCard = document.getElementById("voiceCard");
+const micBtn = document.getElementById("micBtn");
+const statusEl = document.getElementById("status");
+const promptText = document.getElementById("promptText");
+const bars = Array.from(document.querySelectorAll(".bar"));
+
+function setMode(mode) {
+    voiceCard.classList.remove("idle", "recording", "processing", "playing", "error");
+    voiceCard.classList.add(mode);
+}
+
+function setStatus(text) {
+    statusEl.innerText = text;
+}
+
+function setPrompt(text) {
+    promptText.innerText = text;
+}
+
+function stopStream() {
+    if (activeStream) {
+        activeStream.getTracks().forEach(track => track.stop());
+        activeStream = null;
+    }
+}
+
+function stopVisualizer() {
+    if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+        animationFrame = null;
+    }
+    if (audioContext) {
+        audioContext.close().catch(() => {});
+        audioContext = null;
+    }
+    bars.forEach(bar => {
+        bar.style.height = "";
+        bar.style.opacity = "";
+    });
+}
+
+function startVisualizer(stream) {
+    stopVisualizer();
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 64;
+
+    const source = audioContext.createMediaStreamSource(stream);
+    source.connect(analyser);
+
+    const data = new Uint8Array(analyser.frequencyBinCount);
+
+    function draw() {
+        analyser.getByteFrequencyData(data);
+        bars.forEach((bar, index) => {
+            const value = data[index % data.length] || 0;
+            const height = Math.max(14, Math.round((value / 255) * 86));
+            bar.style.height = height + "px";
+            bar.style.opacity = String(Math.max(0.35, value / 255));
+        });
+        animationFrame = requestAnimationFrame(draw);
+    }
+
+    draw();
+}
+
+async function sendTextChoice(text) {
+    try {
+        setMode("processing");
+        setStatus("Sending " + text + "...");
+        micBtn.disabled = true;
+
+        const response = await fetch(`${API_BASE}/chat`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: text, session_id })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
+        setPrompt(data.response || "Ready for your next answer.");
+        setStatus("Ready. Tap the mic and answer.");
+        setMode("idle");
+    } catch (error) {
+        setStatus("Error: " + error.message);
+        setPrompt("Could not send that choice. Make sure Flask is running.");
+        setMode("error");
+    } finally {
+        micBtn.disabled = false;
+    }
+}
+
+async function sendAudio(audioBlob) {
+    const mimeType = audioBlob.type || "audio/webm";
+    const ext = mimeType.includes("ogg") ? ".ogg" : ".webm";
+    const formData = new FormData();
+
+    formData.append("audio", audioBlob, "voice" + ext);
+    formData.append("session_id", session_id);
+
+    setMode("processing");
+    setStatus("Thinking through your answer...");
+    setPrompt("Voice answer sent. Khetflix is preparing an audio response.");
+    micBtn.disabled = true;
+
+    try {
+        const response = await fetch(`${API_BASE}/voice-chat`, {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response.ok) {
+            let errMsg = "Server error " + response.status;
+            try {
+                const errData = await response.json();
+                errMsg = errData.error || errMsg;
+            } catch (_) {}
+            throw new Error(errMsg);
+        }
+
+        const audioData = await response.blob();
+        const audioURL = URL.createObjectURL(audioData);
+        const audio = new Audio(audioURL);
+
+        setMode("playing");
+        setStatus("Playing Khetflix response...");
+        setPrompt("Listen to the response, then tap the mic again for your next answer.");
+
+        audio.onended = () => {
+            URL.revokeObjectURL(audioURL);
+            setMode("idle");
+            setStatus("Ready for your next voice answer.");
+            micBtn.disabled = false;
+        };
+
+        audio.onerror = () => {
+            URL.revokeObjectURL(audioURL);
+            setMode("error");
+            setStatus("Audio playback failed.");
+            setPrompt("The server responded, but the browser could not play the audio.");
+            micBtn.disabled = false;
+        };
+
+        await audio.play();
+    } catch (error) {
+        setMode("error");
+        setStatus("Error: " + error.message);
+        setPrompt("Check your backend, microphone permission, and OpenAI API key, then try again.");
+        micBtn.disabled = false;
+    }
+}
+
+micBtn.addEventListener("click", async () => {
+    try {
+        if (!isRecording) {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+            activeStream = stream;
+            startVisualizer(stream);
+
+            const preferredMime = [
+                "audio/webm;codecs=opus",
+                "audio/webm",
+                "audio/ogg;codecs=opus",
+                "audio/ogg"
+            ].find(type => MediaRecorder.isTypeSupported(type)) || "";
+
+            mediaRecorder = preferredMime
+                ? new MediaRecorder(stream, { mimeType:preferredMime })
+                : new MediaRecorder(stream);
+
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = event => {
+                if (event.data.size > 0) audioChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = async () => {
+                stopVisualizer();
+                stopStream();
+                const audioBlob = new Blob(audioChunks, {
+                    type:mediaRecorder.mimeType || "audio/webm"
+                });
+                await sendAudio(audioBlob);
+            };
+
+            mediaRecorder.start();
+            isRecording = true;
+            setMode("recording");
+            setStatus("Listening... tap again to send.");
+            setPrompt("Speak clearly. Mention location, soil, land size, water, budget, or crop choice when asked.");
+            micBtn.setAttribute("aria-label", "Stop recording and send voice");
+        } else {
+            if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+            }
+            isRecording = false;
+            setMode("processing");
+            setStatus("Processing your voice...");
+            micBtn.setAttribute("aria-label", "Start voice recording");
+        }
+    } catch (error) {
+        stopVisualizer();
+        stopStream();
+        isRecording = false;
+        micBtn.disabled = false;
+        setMode("error");
+
+        if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+            setStatus("Microphone permission denied.");
+            setPrompt("Allow microphone access in your browser, then try again.");
+        } else {
+            setStatus("Error: " + error.message);
+            setPrompt("The microphone could not start. Check browser permissions and device input.");
+        }
+    }
+});
+
+async function resetVoiceSession() {
+    try {
+        setMode("processing");
+        setStatus("Resetting session...");
+        micBtn.disabled = true;
+
+        await fetch(`${API_BASE}/reset`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ session_id })
+        });
+
+        session_id = "voice_" + Math.floor(Math.random() * 999999);
+        await initializeSession();
+    } catch (error) {
+        setMode("error");
+        setStatus("Reset failed.");
+        setPrompt("Could not reset right now. Try refreshing the page.");
+    } finally {
+        micBtn.disabled = false;
+    }
+}
+
+async function initializeSession() {
+    try {
+        setMode("processing");
+        setStatus("Initializing session...");
+        micBtn.disabled = true;
+
+        const response = await fetch(`${API_BASE}/chat`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message:"start", session_id })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
+        setPrompt(data.response || "Choose a language, then answer with your voice.");
+        setStatus("Choose a language or tap the mic.");
+        setMode("idle");
+    } catch (error) {
+        setMode("error");
+        setStatus("Backend not connected.");
+        setPrompt("Start Flask with python app.py, then refresh this page.");
+    } finally {
+        micBtn.disabled = false;
+    }
+}
+
+window.addEventListener("load", initializeSession);
+</script>
+</body>
+</html>
