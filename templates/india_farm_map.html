@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Khetflix India Farm Map</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<style>
+:root{
+    --bg:#050505;
+    --panel:#101010;
+    --panel2:#171717;
+    --red:#ff4d4d;
+    --red2:#ff7b7b;
+    --green:#35d07f;
+    --yellow:#f2c94c;
+    --orange:#f2994a;
+    --text:#f5f5f5;
+    --muted:#a7a7a7;
+    --border:rgba(255,255,255,0.08);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+html,
+body{
+    width:100%;
+    min-height:100%;
+    background:var(--bg);
+    color:var(--text);
+    overflow-x:hidden;
+}
+
+body::before{
+    content:'';
+    position:fixed;
+    inset:auto -220px -260px auto;
+    width:620px;
+    height:620px;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(255,77,77,0.14),transparent 70%);
+    filter:blur(70px);
+    pointer-events:none;
+}
+
+.top-nav{
+    position:fixed;
+    top:18px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:1000;
+    display:flex;
+    gap:10px;
+    padding:8px;
+    border-radius:18px;
+    background:rgba(12,12,12,0.84);
+    border:1px solid var(--border);
+    backdrop-filter:blur(18px);
+}
+
+.top-nav a{
+    color:#aaa;
+    text-decoration:none;
+    font-size:0.82rem;
+    font-weight:600;
+    padding:8px 12px;
+    border-radius:12px;
+    transition:0.25s;
+    white-space:nowrap;
+}
+
+.top-nav a:hover,
+.top-nav a.active{
+    color:white;
+    background:rgba(255,77,77,0.16);
+}
+
+.shell{
+    position:relative;
+    z-index:1;
+    min-height:100svh;
+    display:grid;
+    grid-template-columns:minmax(320px,390px) minmax(0,1fr);
+    gap:22px;
+    padding:96px 30px 28px;
+}
+
+.panel{
+    min-width:0;
+    border:1px solid var(--border);
+    background:linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.025));
+    box-shadow:0 24px 70px rgba(0,0,0,0.36);
+    backdrop-filter:blur(18px);
+}
+
+.sidebar{
+    border-radius:24px;
+    padding:22px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    min-height:0;
+}
+
+.eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    color:var(--red2);
+    background:rgba(255,77,77,0.09);
+    border:1px solid rgba(255,77,77,0.18);
+    border-radius:999px;
+    padding:8px 13px;
+    font-size:0.74rem;
+    font-weight:700;
+    letter-spacing:0.11em;
+    text-transform:uppercase;
+}
+
+.dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 18px var(--green);
+}
+
+h1{
+    font-size:clamp(2rem,3.6vw,3.55rem);
+    line-height:1.05;
+    margin-top:8px;
+}
+
+h1 span{
+    color:var(--red2);
+}
+
+.subtitle{
+    color:#cfcfcf;
+    font-size:0.92rem;
+    line-height:1.7;
+}
+
+.layer-list{
+    display:grid;
+    gap:10px;
+}
+
+.layer-btn{
+    width:100%;
+    display:grid;
+    grid-template-columns:16px 1fr auto;
+    align-items:center;
+    gap:12px;
+    border:1px solid var(--border);
+    background:rgba(255,255,255,0.045);
+    color:white;
+    border-radius:14px;
+    padding:12px;
+    cursor:pointer;
+    text-align:left;
+    transition:0.2s;
+}
+
+.layer-btn:hover,
+.layer-btn.active{
+    border-color:rgba(255,77,77,0.34);
+    background:rgba(255,77,77,0.1);
+}
+
+.swatch{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    box-shadow:0 0 18px currentColor;
+}
+
+.layer-btn strong{
+    display:block;
+    font-size:0.86rem;
+}
+
+.layer-btn small{
+    display:block;
+    color:var(--muted);
+    font-size:0.72rem;
+    line-height:1.5;
+    margin-top:2px;
+}
+
+.toggle-state{
+    color:var(--muted);
+    font-size:0.72rem;
+}
+
+.legend,
+.nearest{
+    border-top:1px solid var(--border);
+    padding-top:16px;
+}
+
+.legend h2,
+.nearest h2{
+    font-size:0.94rem;
+    margin-bottom:10px;
+}
+
+.legend-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+}
+
+.legend-item{
+    color:#d8d8d8;
+    font-size:0.75rem;
+    display:flex;
+    gap:8px;
+    align-items:center;
+    min-width:0;
+}
+
+.nearest-list{
+    display:grid;
+    gap:8px;
+}
+
+.nearest-card{
+    border:1px solid var(--border);
+    background:rgba(255,255,255,0.045);
+    border-radius:14px;
+    padding:10px;
+}
+
+.nearest-card b{
+    display:block;
+    font-size:0.8rem;
+}
+
+.nearest-card span{
+    color:var(--muted);
+    display:block;
+    font-size:0.72rem;
+    line-height:1.5;
+    margin-top:3px;
+}
+
+.geo-btn{
+    width:100%;
+    margin-top:10px;
+    border:0;
+    border-radius:14px;
+    color:#080808;
+    background:linear-gradient(135deg,var(--red),var(--red2));
+    padding:11px 14px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.map-wrap{
+    position:relative;
+    border-radius:24px;
+    overflow:hidden;
+    min-height:calc(100svh - 124px);
+}
+
+#map{
+    width:100%;
+    height:100%;
+    min-height:calc(100svh - 124px);
+    background:#0b0b0b;
+}
+
+.status-strip{
+    position:absolute;
+    z-index:700;
+    left:18px;
+    right:18px;
+    bottom:18px;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:10px;
+    pointer-events:none;
+}
+
+.metric{
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(10,10,10,0.82);
+    backdrop-filter:blur(16px);
+    border-radius:16px;
+    padding:12px;
+    min-width:0;
+}
+
+.metric b{
+    display:block;
+    font-size:1rem;
+    color:white;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.metric span{
+    color:var(--muted);
+    display:block;
+    font-size:0.72rem;
+    margin-top:4px;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip{
+    background:#111;
+    color:#f5f5f5;
+    border:1px solid rgba(255,255,255,0.12);
+}
+
+.popup-title{
+    font-weight:800;
+    margin-bottom:5px;
+}
+
+.popup-meta{
+    color:#bbb;
+    line-height:1.55;
+    font-size:0.82rem;
+}
+
+.marker-pin{
+    width:18px;
+    height:18px;
+    border-radius:50% 50% 50% 0;
+    transform:rotate(-45deg);
+    border:2px solid #fff;
+    box-shadow:0 4px 18px rgba(0,0,0,0.4);
+}
+
+.marker-pin span{
+    display:block;
+    width:6px;
+    height:6px;
+    margin:4px;
+    border-radius:50%;
+    background:#fff;
+}
+
+@media(max-width:1080px){
+    .shell{
+        grid-template-columns:1fr;
+    }
+
+    .map-wrap,
+    #map{
+        min-height:620px;
+    }
+}
+
+@media(max-width:720px){
+    .top-nav{
+        max-width:calc(100vw - 20px);
+        overflow-x:auto;
+        justify-content:flex-start;
+    }
+
+    .top-nav a{
+        padding:8px 9px;
+        font-size:0.74rem;
+    }
+
+    .shell{
+        padding:88px 14px 18px;
+    }
+
+    .sidebar{
+        padding:18px;
+    }
+
+    .status-strip{
+        position:static;
+        grid-template-columns:1fr 1fr;
+        padding:12px;
+        background:#050505;
+    }
+
+    .map-wrap,
+    #map{
+        min-height:560px;
+    }
+}
+</style>
+</head>
+
+<body>
+<nav class="top-nav" aria-label="Main navigation">
+    <a href="/chatbot">Chatbot</a>
+    <a href="/voicebot">Voicebot</a>
+    <a href="/progressive-feedback">Progressive Feedback</a>
+    <a href="/scheme-finder">Scheme Finder</a>
+    <a class="active" href="/india-farm-map">India Farm Map</a>
+    <a href="/login">Logout</a>
+</nav>
+
+<main class="shell">
+    <aside class="panel sidebar">
+        <div class="eyebrow"><span class="dot"></span> India farm intelligence</div>
+        <h1>Map every farming signal <span>in one view</span></h1>
+        <p class="subtitle">
+            Soil quality, water status, market demand, pest-risk zones, and nearby mandis are layered on one India-only map.
+        </p>
+
+        <section class="layer-list" aria-label="Map layer controls">
+            <button class="layer-btn active" type="button" data-layer="soil">
+                <span class="swatch" style="color:#f2994a;background:#f2994a"></span>
+                <span><strong>Soil Quality Mapping</strong><small>Regional soil health and farming fit zones.</small></span>
+                <span class="toggle-state">On</span>
+            </button>
+            <button class="layer-btn active" type="button" data-layer="water">
+                <span class="swatch" style="color:#2f80ed;background:#2f80ed"></span>
+                <span><strong>Water Availability Indicator</strong><small>Rain and moisture signal from live weather.</small></span>
+                <span class="toggle-state">On</span>
+            </button>
+            <button class="layer-btn active" type="button" data-layer="markets">
+                <span class="swatch" style="color:#35d07f;background:#35d07f"></span>
+                <span><strong>Live Market Demand Tracker</strong><small>Crop demand hotspots and selling notes.</small></span>
+                <span class="toggle-state">On</span>
+            </button>
+            <button class="layer-btn active" type="button" data-layer="disease">
+                <span class="swatch" style="color:#ff4d4d;background:#ff4d4d"></span>
+                <span><strong>Disease & Pest Alert Zones</strong><small>Weather-based crop-health risk signals.</small></span>
+                <span class="toggle-state">On</span>
+            </button>
+            <button class="layer-btn active" type="button" data-layer="mandis">
+                <span class="swatch" style="color:#b96cff;background:#b96cff"></span>
+                <span><strong>Nearby Market & Mandi Finder</strong><small>Major agriculture market pointers.</small></span>
+                <span class="toggle-state">On</span>
+            </button>
+        </section>
+
+        <section class="legend">
+            <h2>Legend</h2>
+            <div class="legend-grid">
+                <div class="legend-item"><span class="swatch" style="color:#35d07f;background:#35d07f"></span> Good / high</div>
+                <div class="legend-item"><span class="swatch" style="color:#f2c94c;background:#f2c94c"></span> Moderate</div>
+                <div class="legend-item"><span class="swatch" style="color:#f2994a;background:#f2994a"></span> Watch zone</div>
+                <div class="legend-item"><span class="swatch" style="color:#ff4d4d;background:#ff4d4d"></span> Alert</div>
+                <div class="legend-item"><span class="swatch" style="color:#2f80ed;background:#2f80ed"></span> Water</div>
+                <div class="legend-item"><span class="swatch" style="color:#b96cff;background:#b96cff"></span> Mandi</div>
+            </div>
+        </section>
+
+        <section class="nearest">
+            <h2>Nearest Mandis</h2>
+            <div class="nearest-list" id="nearestList">
+                <div class="nearest-card">
+                    <b>Location not selected</b>
+                    <span>Use your location to sort mandi pointers by distance.</span>
+                </div>
+            </div>
+            <button class="geo-btn" type="button" id="geoBtn">Use My Location</button>
+        </section>
+    </aside>
+
+    <section class="panel map-wrap">
+        <div id="map" aria-label="India farm intelligence map"></div>
+        <div class="status-strip">
+            <div class="metric"><b id="soilCount">--</b><span>soil zones</span></div>
+            <div class="metric"><b id="waterCount">--</b><span>water signals</span></div>
+            <div class="metric"><b id="marketCount">--</b><span>market signals</span></div>
+            <div class="metric"><b id="diseaseCount">--</b><span>pest alerts</span></div>
+            <div class="metric"><b id="updatedAt">Loading</b><span>latest refresh</span></div>
+        </div>
+    </section>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map = L.map("map", {
+    zoomControl:false,
+    minZoom:4,
+    maxBounds:[[5.5, 66.0], [37.5, 98.5]],
+    maxBoundsViscosity:0.85
+}).setView([22.8, 79.0], 5);
+
+L.control.zoom({ position:"bottomright" }).addTo(map);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom:18,
+    attribution:"&copy; OpenStreetMap contributors"
+}).addTo(map);
+
+const layerGroups = {
+    soil:L.layerGroup().addTo(map),
+    water:L.layerGroup().addTo(map),
+    markets:L.layerGroup().addTo(map),
+    disease:L.layerGroup().addTo(map),
+    mandis:L.layerGroup().addTo(map)
+};
+
+let mapData = null;
+let userMarker = null;
+
+function pinIcon(color) {
+    return L.divIcon({
+        className:"",
+        iconSize:[22, 22],
+        iconAnchor:[11, 22],
+        popupAnchor:[0, -20],
+        html:`<div class="marker-pin" style="background:${color}"><span></span></div>`
+    });
+}
+
+function popup(title, lines) {
+    return `<div class="popup-title">${title}</div><div class="popup-meta">${lines.join("<br>")}</div>`;
+}
+
+function addSoilLayer(items) {
+    layerGroups.soil.clearLayers();
+    items.forEach((item) => {
+        L.circle([item.lat, item.lng], {
+            radius:item.radius,
+            color:item.color,
+            fillColor:item.color,
+            fillOpacity:0.14,
+            weight:2
+        }).bindPopup(popup(item.name, [
+            `Quality: ${item.quality}`,
+            item.note
+        ])).addTo(layerGroups.soil);
+    });
+}
+
+function addWaterLayer(items) {
+    layerGroups.water.clearLayers();
+    items.forEach((item) => {
+        L.circleMarker([item.lat, item.lng], {
+            radius:11,
+            color:item.color,
+            fillColor:item.color,
+            fillOpacity:0.88,
+            weight:2
+        }).bindPopup(popup(item.name, [
+            `Water: ${item.level}`,
+            item.weather,
+            item.note
+        ])).addTo(layerGroups.water);
+    });
+}
+
+function addMarketLayer(items) {
+    layerGroups.markets.clearLayers();
+    items.forEach((item) => {
+        L.marker([item.lat, item.lng], { icon:pinIcon(item.color) })
+            .bindPopup(popup(`${item.crop} - ${item.place}`, [
+                `Demand: ${item.demand} (${item.score}/100)`,
+                item.note
+            ]))
+            .addTo(layerGroups.markets);
+    });
+}
+
+function addDiseaseLayer(items) {
+    layerGroups.disease.clearLayers();
+    items.forEach((item) => {
+        L.circle([item.lat, item.lng], {
+            radius:item.risk === "High" ? 52000 : 36000,
+            color:item.color,
+            fillColor:item.color,
+            fillOpacity:item.risk === "High" ? 0.2 : 0.12,
+            weight:2,
+            dashArray:item.risk === "Low" ? "4 8" : null
+        }).bindPopup(popup(`${item.name} crop-health zone`, [
+            `Risk: ${item.risk}`,
+            item.weather,
+            item.note
+        ])).addTo(layerGroups.disease);
+    });
+}
+
+function addMandiLayer(items) {
+    layerGroups.mandis.clearLayers();
+    items.forEach((item) => {
+        L.marker([item.lat, item.lng], { icon:pinIcon("#b96cff") })
+            .bindPopup(popup(item.name, [
+                `${item.state}`,
+                item.type
+            ]))
+            .addTo(layerGroups.mandis);
+    });
+}
+
+function updateMetrics(data) {
+    document.getElementById("soilCount").innerText = data.layers.soil.length;
+    document.getElementById("waterCount").innerText = data.layers.water.length;
+    document.getElementById("marketCount").innerText = data.layers.markets.length;
+    const alertCount = data.layers.disease.filter((item) => item.risk !== "Low").length;
+    document.getElementById("diseaseCount").innerText = alertCount;
+    document.getElementById("updatedAt").innerText = new Date(data.generated_at).toLocaleTimeString([], {
+        hour:"2-digit",
+        minute:"2-digit"
+    });
+}
+
+function renderMapData(data) {
+    mapData = data;
+    addSoilLayer(data.layers.soil);
+    addWaterLayer(data.layers.water);
+    addMarketLayer(data.layers.markets);
+    addDiseaseLayer(data.layers.disease);
+    addMandiLayer(data.layers.mandis);
+    updateMetrics(data);
+}
+
+function distanceKm(a, b) {
+    const toRad = value => value * Math.PI / 180;
+    const earth = 6371;
+    const dLat = toRad(b.lat - a.lat);
+    const dLng = toRad(b.lng - a.lng);
+    const lat1 = toRad(a.lat);
+    const lat2 = toRad(b.lat);
+    const x = Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+    return earth * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+}
+
+function renderNearestMandis(position) {
+    const list = document.getElementById("nearestList");
+    if (!mapData) return;
+
+    const sorted = mapData.layers.mandis
+        .map((mandi) => ({ ...mandi, distance:distanceKm(position, mandi) }))
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, 4);
+
+    list.innerHTML = "";
+    sorted.forEach((mandi) => {
+        const card = document.createElement("div");
+        card.className = "nearest-card";
+        card.innerHTML = `<b>${mandi.name}</b><span>${mandi.state} - ${Math.round(mandi.distance)} km away<br>${mandi.type}</span>`;
+        list.appendChild(card);
+    });
+}
+
+document.querySelectorAll(".layer-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+        const name = button.dataset.layer;
+        const state = button.querySelector(".toggle-state");
+        if (map.hasLayer(layerGroups[name])) {
+            map.removeLayer(layerGroups[name]);
+            button.classList.remove("active");
+            state.innerText = "Off";
+        } else {
+            layerGroups[name].addTo(map);
+            button.classList.add("active");
+            state.innerText = "On";
+        }
+    });
+});
+
+document.getElementById("geoBtn").addEventListener("click", () => {
+    if (!navigator.geolocation) {
+        document.getElementById("nearestList").innerHTML = `<div class="nearest-card"><b>Location unavailable</b><span>Your browser cannot share location.</span></div>`;
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition((geo) => {
+        const position = {
+            lat:geo.coords.latitude,
+            lng:geo.coords.longitude
+        };
+
+        if (userMarker) {
+            userMarker.setLatLng([position.lat, position.lng]);
+        } else {
+            userMarker = L.marker([position.lat, position.lng], { icon:pinIcon("#ffffff") })
+                .bindPopup(popup("Your location", ["Nearest mandis are sorted in the left panel."]))
+                .addTo(map);
+        }
+
+        map.setView([position.lat, position.lng], 7);
+        renderNearestMandis(position);
+    }, () => {
+        document.getElementById("nearestList").innerHTML = `<div class="nearest-card"><b>Permission blocked</b><span>Allow location access to calculate nearby mandis.</span></div>`;
+    }, { enableHighAccuracy:true, timeout:8000 });
+});
+
+fetch("/api/india-farm-map")
+    .then((response) => response.json())
+    .then(renderMapData)
+    .catch(() => {
+        document.getElementById("updatedAt").innerText = "Offline";
+    });
+</script>
+</body>
+</html>

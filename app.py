@@ -7,6 +7,10 @@ from io import BytesIO
 import tempfile
 import os
 import time
+import json
+from datetime import datetime, timezone
+from urllib.parse import urlencode
+from urllib.request import urlopen
 
 from reportlab.platypus import (
     SimpleDocTemplate,
@@ -350,6 +354,178 @@ def progressive_feedback_page():
 @app.route("/scheme-finder")
 def scheme_finder_page():
     return render_template("scheme_finder.html")
+
+
+@app.route("/india-farm-map")
+def india_farm_map_page():
+    return render_template("india_farm_map.html")
+
+
+INDIA_MAP_POINTS = {
+    "soil": [
+        {"name": "Punjab-Haryana alluvial belt", "lat": 30.9, "lng": 76.1, "quality": "High", "color": "#35d07f", "note": "Fertile alluvial soils; watch salinity and residue management.", "radius": 72000},
+        {"name": "Indo-Gangetic plains", "lat": 26.85, "lng": 80.95, "quality": "High", "color": "#35d07f", "note": "Good wheat, rice, pulses, vegetables; benefits from organic matter addition.", "radius": 90000},
+        {"name": "Black cotton soil zone", "lat": 20.6, "lng": 76.2, "quality": "Medium", "color": "#f2c94c", "note": "Deep clay soils for cotton, soybean, pulses; drainage is important.", "radius": 110000},
+        {"name": "Red soil belt", "lat": 14.7, "lng": 78.5, "quality": "Medium", "color": "#f2994a", "note": "Often low in nitrogen and organic carbon; good response to compost and micronutrients.", "radius": 105000},
+        {"name": "Coastal laterite zone", "lat": 12.9, "lng": 75.2, "quality": "Moderate", "color": "#ff7b7b", "note": "Acidic laterite soils; lime, mulch, and erosion control help.", "radius": 78000}
+    ],
+    "markets": [
+        {"crop": "Tomato", "place": "Kolar, Karnataka", "lat": 13.14, "lng": 78.13, "demand": "High", "score": 88, "color": "#35d07f", "note": "Strong vegetable flow; grade carefully and avoid distress bulk selling."},
+        {"crop": "Onion", "place": "Lasalgaon, Maharashtra", "lat": 20.14, "lng": 74.24, "demand": "High", "score": 91, "color": "#35d07f", "note": "Major onion hub; storage and timing can change returns sharply."},
+        {"crop": "Cotton", "place": "Rajkot, Gujarat", "lat": 22.30, "lng": 70.80, "demand": "Medium", "score": 68, "color": "#f2c94c", "note": "Textile-linked demand; quality and moisture affect price."},
+        {"crop": "Rice", "place": "Burdwan, West Bengal", "lat": 23.23, "lng": 87.86, "demand": "Medium", "score": 64, "color": "#f2c94c", "note": "Stable cereal demand; milling quality matters."},
+        {"crop": "Wheat", "place": "Indore, Madhya Pradesh", "lat": 22.72, "lng": 75.86, "demand": "Medium", "score": 72, "color": "#f2c94c", "note": "Mandi and processor demand; protein and grain cleanliness help."},
+        {"crop": "Banana", "place": "Jalgaon, Maharashtra", "lat": 21.01, "lng": 75.56, "demand": "High", "score": 84, "color": "#35d07f", "note": "Strong fruit supply chain; packaging and ripening links matter."}
+    ],
+    "mandis": [
+        {"name": "Azadpur Mandi", "state": "Delhi", "lat": 28.71, "lng": 77.17, "type": "Fruit and vegetables"},
+        {"name": "Lasalgaon APMC", "state": "Maharashtra", "lat": 20.14, "lng": 74.24, "type": "Onion"},
+        {"name": "Kolar APMC", "state": "Karnataka", "lat": 13.14, "lng": 78.13, "type": "Vegetables"},
+        {"name": "Unjha APMC", "state": "Gujarat", "lat": 23.80, "lng": 72.39, "type": "Spices and cumin"},
+        {"name": "Guntur Mirchi Yard", "state": "Andhra Pradesh", "lat": 16.31, "lng": 80.44, "type": "Chilli"},
+        {"name": "Indore Mandi", "state": "Madhya Pradesh", "lat": 22.72, "lng": 75.86, "type": "Grains and pulses"},
+        {"name": "Vashi APMC", "state": "Maharashtra", "lat": 19.07, "lng": 73.00, "type": "Wholesale produce"},
+        {"name": "Burdwan Rice Market", "state": "West Bengal", "lat": 23.23, "lng": 87.86, "type": "Rice"},
+        {"name": "Coimbatore Market", "state": "Tamil Nadu", "lat": 11.01, "lng": 76.96, "type": "Cotton and vegetables"},
+        {"name": "Ludhiana Mandi", "state": "Punjab", "lat": 30.90, "lng": 75.86, "type": "Grains and vegetables"}
+    ],
+    "weather_zones": [
+        {"name": "Delhi NCR", "lat": 28.61, "lng": 77.20},
+        {"name": "Ludhiana", "lat": 30.90, "lng": 75.86},
+        {"name": "Lucknow", "lat": 26.85, "lng": 80.95},
+        {"name": "Patna", "lat": 25.59, "lng": 85.14},
+        {"name": "Kolkata", "lat": 22.57, "lng": 88.36},
+        {"name": "Guwahati", "lat": 26.14, "lng": 91.74},
+        {"name": "Ahmedabad", "lat": 23.02, "lng": 72.57},
+        {"name": "Indore", "lat": 22.72, "lng": 75.86},
+        {"name": "Nagpur", "lat": 21.15, "lng": 79.09},
+        {"name": "Hyderabad", "lat": 17.39, "lng": 78.49},
+        {"name": "Bengaluru", "lat": 12.97, "lng": 77.59},
+        {"name": "Chennai", "lat": 13.08, "lng": 80.27},
+        {"name": "Kochi", "lat": 9.93, "lng": 76.27},
+        {"name": "Jaipur", "lat": 26.91, "lng": 75.79}
+    ]
+}
+
+
+def fetch_weather_snapshot(points):
+    query = urlencode({
+        "latitude": ",".join(str(point["lat"]) for point in points),
+        "longitude": ",".join(str(point["lng"]) for point in points),
+        "current": "temperature_2m,relative_humidity_2m,precipitation",
+        "daily": "precipitation_sum",
+        "forecast_days": 1,
+        "timezone": "Asia/Kolkata"
+    })
+
+    url = f"https://api.open-meteo.com/v1/forecast?{query}"
+
+    try:
+        with urlopen(url, timeout=5) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except Exception:
+        return None
+
+    if isinstance(payload, dict):
+        payload = [payload]
+
+    return payload
+
+
+def build_weather_layers():
+    zones = INDIA_MAP_POINTS["weather_zones"]
+    weather_payload = fetch_weather_snapshot(zones)
+
+    water = []
+    disease = []
+
+    for index, zone in enumerate(zones):
+        current = {}
+        daily = {}
+
+        if weather_payload and index < len(weather_payload):
+            current = weather_payload[index].get("current", {}) or {}
+            daily = weather_payload[index].get("daily", {}) or {}
+
+        temp = current.get("temperature_2m")
+        humidity = current.get("relative_humidity_2m")
+        rain_now = current.get("precipitation") or 0
+        rain_sum = (daily.get("precipitation_sum") or [0])[0] if daily else 0
+
+        if rain_sum >= 8 or rain_now >= 2:
+            water_level = "Good"
+            water_color = "#35d07f"
+            water_note = "Rain signal is supportive; avoid over-irrigation and check drainage."
+        elif rain_sum >= 1:
+            water_level = "Moderate"
+            water_color = "#f2c94c"
+            water_note = "Light rain signal; irrigate based on soil moisture, not calendar."
+        else:
+            water_level = "Low"
+            water_color = "#ff7b7b"
+            water_note = "Low rain signal; prioritize mulching, drip timing, and moisture checks."
+
+        risk = "Low"
+        risk_color = "#35d07f"
+        risk_note = "No strong weather-driven pest or disease trigger in this snapshot."
+
+        if humidity and humidity >= 78 and rain_sum >= 1:
+            risk = "High"
+            risk_color = "#ff4d4d"
+            risk_note = "Humid/rainy conditions can raise fungal disease pressure."
+        elif temp and temp >= 34 and rain_sum < 1:
+            risk = "Medium"
+            risk_color = "#f2994a"
+            risk_note = "Hot and dry conditions can increase mite, sucking pest, and water-stress risk."
+        elif humidity and humidity >= 68:
+            risk = "Medium"
+            risk_color = "#f2c94c"
+            risk_note = "Humidity is enough to justify closer leaf and stem checks."
+
+        weather_text = (
+            f"{temp if temp is not None else '--'} C, "
+            f"{humidity if humidity is not None else '--'}% humidity, "
+            f"{rain_sum if rain_sum is not None else '--'} mm rain forecast"
+        )
+
+        water.append({
+            **zone,
+            "level": water_level,
+            "color": water_color,
+            "note": water_note,
+            "weather": weather_text
+        })
+
+        disease.append({
+            **zone,
+            "risk": risk,
+            "color": risk_color,
+            "note": risk_note,
+            "weather": weather_text
+        })
+
+    return water, disease
+
+
+@app.route("/api/india-farm-map")
+def india_farm_map_data():
+    water, disease = build_weather_layers()
+
+    return jsonify({
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "country": "India",
+        "source_note": (
+            "Weather-derived water and pest indicators use Open-Meteo. "
+            "Soil, market, and mandi markers are practical reference points and should be verified locally."
+        ),
+        "layers": {
+            "soil": INDIA_MAP_POINTS["soil"],
+            "water": water,
+            "markets": INDIA_MAP_POINTS["markets"],
+            "disease": disease,
+            "mandis": INDIA_MAP_POINTS["mandis"]
+        }
+    })
 
 
 def encode_uploaded_image(image_file):
