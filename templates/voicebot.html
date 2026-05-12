@@ -653,7 +653,7 @@ h1 span{
 </main>
 
 <script>
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "";
 
 let mediaRecorder = null;
 let audioChunks = [];
@@ -754,7 +754,7 @@ async function sendTextChoice(text) {
         setMode("idle");
     } catch (error) {
         setStatus("Error: " + error.message);
-        setPrompt("Could not send that choice. Make sure Flask is running.");
+        setPrompt("Could not send that choice. Refresh the page or check that the deployed backend is live.");
         setMode("error");
     } finally {
         micBtn.disabled = false;
@@ -933,7 +933,7 @@ async function initializeSession() {
     } catch (error) {
         setMode("error");
         setStatus("Backend not connected.");
-        setPrompt("Start Flask with python app.py, then refresh this page.");
+        setPrompt("Refresh the page or check that the deployed backend is live.");
     } finally {
         micBtn.disabled = false;
     }

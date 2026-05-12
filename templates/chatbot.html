@@ -635,7 +635,7 @@ textarea::placeholder{
 </main>
 
 <script>
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "";
 
 const session_id = "user_" + Math.floor(Math.random() * 999999);
 
@@ -739,7 +739,7 @@ async function sendMessage() {
         removeTyping();
         setBusy(false);
         addMessage(
-            "Server connection failed.\nMake sure Flask backend is running at:\n" + API_BASE,
+            "Server connection failed.\nPlease refresh the page or check that the deployed backend is live.",
             "bot"
         );
     }
@@ -822,7 +822,7 @@ Let's begin step-by-step.`,
     } catch (err) {
         removeTyping();
         addMessage(
-            "Backend server not running.\nStart Flask with: python app.py",
+            "Server connection failed.\nPlease refresh the page or check that the deployed backend is live.",
             "bot"
         );
     }

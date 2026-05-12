@@ -627,7 +627,7 @@ textarea::placeholder{
 </main>
 
 <script>
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "";
 
 const form = document.getElementById("feedbackForm");
 const imageInput = document.getElementById("imageInput");
@@ -699,7 +699,7 @@ form.addEventListener("submit", async (event) => {
         resultContent.innerText = data.response;
         statusText.innerText = "Feedback ready";
     } catch (error) {
-        resultContent.innerText = "Error: " + error.message + "\n\nMake sure Flask is running and your OpenAI API key is configured.";
+        resultContent.innerText = "Error: " + error.message + "\n\nRefresh the page and check that the deployed backend is live with OPENAI_API_KEY configured.";
         statusText.innerText = "Error";
     } finally {
         setBusy(false);
